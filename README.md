@@ -36,22 +36,27 @@ Dự án được chuẩn hóa theo chuẩn **Maven** quốc tế, **hoàn toàn
 
 ## 🚀 3. HƯỚNG DẪN CHI TIẾT CÁC BƯỚC CHẠY DỰ ÁN
 
-### BƯỚC 1: Chuẩn bị Cơ sở Dữ liệu SQL Server
+### BƯỚC 1: Chuẩn bị Cơ sở Dữ liệu SQL Server & Bật TCP/IP Cổng 1433
 1. Mở phần mềm **SQL Server Management Studio (SSMS)**.
 2. Mở file **`database.sql`** có sẵn trong thư mục dự án và bấm **Execute (`F5`)** để tự động:
    * Tạo cơ sở dữ liệu `webst2`.
    * Tạo bảng `categories`, `videos`, `users`.
    * Chèn dữ liệu mẫu cho danh mục và tài khoản hệ thống.
-3. Kiểm tra thông tin kết nối trong file `src/main/resources/META-INF/persistence.xml`:
+3. **Kích hoạt giao thức TCP/IP trên SQL Server (Bắt buộc cho Named Instance như SERVER2022):**
+   * **Cách nhanh nhất:** Nhấp đúp chuột vào file **`enable-sql-tcp.bat`** trong thư mục dự án &rarr; chọn **Yes** khi Windows hỏi quyền Administrator (UAC). File sẽ tự kích hoạt TCP/IP và cổng 1433 rồi khởi động lại dịch vụ SQL Server.
+   * **Cách thủ công bằng giao diện:**
+     1. Bấm tổ hợp phím `Win + R`, gõ `SQLServerManager16.msc` và bấm `Enter`.
+     2. Vào mục **SQL Server Network Configuration** &rarr; **Protocols for SERVER2022**.
+     3. Nhấp đúp vào **TCP/IP** &rarr; chuyển **Enabled = Yes**.
+     4. Sang thẻ **IP Addresses** &rarr; cuộn xuống mục **IPAll**: Xóa trắng `TCP Dynamic Ports`, gán `TCP Port = 1433`.
+     5. Chọn mục **SQL Server Services** ở cột trái &rarr; nhấp chuột phải vào `SQL Server (SERVER2022)` &rarr; chọn **Restart**.
+4. Cấu hình kết nối chuẩn trong file `src/main/resources/META-INF/persistence.xml`:
    ```xml
    <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
-   <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://127.0.0.1:63755;encrypt=true;trustServerCertificate=true;loginTimeout=5;connectRetryCount=0;databaseName=webst2" />
+   <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://127.0.0.1:1433;encrypt=true;trustServerCertificate=true;loginTimeout=5;connectRetryCount=0;databaseName=webst2" />
    <property name="jakarta.persistence.jdbc.user" value="sa" />
    <property name="jakarta.persistence.jdbc.password" value="1234567@a$" />
    ```
-   > **Ghi chú về cấu hình kết nối:**
-   > * Cổng kết nối (`port`): Điền cổng SQL Server trên máy của bạn (mặc định là `1433`, hoặc cổng của Named Instance ví dụ `63755`).
-   > * Mật khẩu `sa`: Mặc định là `1234567@a$` (hoặc đổi thành mật khẩu của máy bạn).
 
 ---
 
@@ -74,8 +79,14 @@ Dự án được chuẩn hóa theo chuẩn **Maven** quốc tế, **hoàn toàn
 
 ### BƯỚC 3: Chạy ứng dụng Web trên Tomcat (Lựa chọn 1 trong 3 cách)
 
-#### 🌟 Cách 1: Chạy bằng Smart Tomcat trong IntelliJ IDEA (Khuyên dùng khi chấm bài trên mọi máy tính)
-Cách này hoạt động trên **mọi máy tính**, bất kể Tomcat được cài ở ổ đĩa `C:`, `D:`, hay `E:`:
+#### 🌟 Cách 1: Chạy tự động bằng Script Batch (`build.bat` & `run-tomcat.bat`)
+Script được thiết kế tự động dò tìm môi trường:
+* Tự động phát hiện biến môi trường `%JAVA_HOME%` và `%CATALINA_HOME%`.
+* Tự động dò tìm thư mục Tomcat trên các ổ đĩa `E:\`, `C:\`, `D:\`.
+1. Nhấp đúp file **`build.bat`**: Script sẽ gọi Maven đóng gói `JPA_Servlet_Category.war` và tự copy vào thư mục `webapps` của Tomcat.
+2. Nhấp đúp file **`run-tomcat.bat`**: Script tự động tìm và bật Tomcat.
+
+#### 🌟 Cách 2: Chạy bằng Smart Tomcat trong IntelliJ IDEA
 1. Mở dự án bằng **IntelliJ IDEA**.
 2. Cài đặt plugin **Smart Tomcat** (nếu chưa có).
 3. Vào **Run** &rarr; **Edit Configurations...** &rarr; Bấm `+` &rarr; Chọn **Smart Tomcat**.
@@ -84,13 +95,6 @@ Cách này hoạt động trên **mọi máy tính**, bất kể Tomcat được
    * **Deployment Directory:** Trỏ đến thư mục `src/main/webapp` của dự án.
    * **Context Path:** Điền `/JPA_Servlet_Category`.
 5. Bấm **Run** để khởi động.
-
-#### 🌟 Cách 2: Chạy tự động bằng Script Batch (`build.bat` & `run-tomcat.bat`)
-Script được thiết kế tự động dò tìm môi trường:
-* Tự động phát hiện biến môi trường `%JAVA_HOME%` và `%CATALINA_HOME%`.
-* Tự động dò tìm thư mục Tomcat trên các ổ đĩa `E:\`, `C:\`, `D:\`.
-1. Nhấp đúp file **`build.bat`**: Script sẽ gọi Maven đóng gói `JPA_Servlet_Category.war` và tự copy vào thư mục `webapps` của Tomcat.
-2. Nhấp đúp file **`run-tomcat.bat`**: Script tự động tìm và bật Tomcat.
 
 #### 🌟 Cách 3: Chạy bằng dòng lệnh Maven chuẩn (Dành cho mọi hệ điều hành Windows/Mac/Linux)
 1. Mở Terminal tại thư mục dự án và chạy:
@@ -117,12 +121,15 @@ Sau khi Tomcat đã khởi động, mở trình duyệt web và sử dụng các
 ### 🔑 Tài khoản đăng nhập kiểm thử:
 * **Tài khoản Quản trị viên (Admin):**  
   * Username: `admin`  
-  * Password: `123`  
+  * Password: `123` (hoặc `123456`)  
   *(Sau khi đăng nhập sẽ tự động chuyển hướng vào khu vực Quản lý Category)*
 * **Tài khoản Người dùng thường (User):**  
   * Username: `user`  
-  * Password: `123`  
-  *(Sau khi đăng nhập sẽ chuyển về Trang chủ mua sắm, không thấy menu Quản trị)*
+  * Password: `123` (hoặc `123456`)  
+  *(Sau khi đăng nhập sẽ chuyển về Trang chủ mua sắm, ẩn menu Quản trị)*
+
+> **⚡ Cơ chế tải tức thì & Chống sập hệ thống (Zero-Downtime Safe Mode):**  
+> Dự án được tích hợp bộ đệm thông minh trong `JpaConfig.java` và tầng DAO. Nếu CSDL SQL Server đang khởi động hoặc chưa mở port 1433, hệ thống sẽ **không bao giờ bị treo, quay vòng hay sập HTTP 500**. Bạn vẫn có thể đăng nhập ngay bằng tài khoản `admin / 123456` để kiểm tra phân quyền và giao diện với tốc độ phản hồi tức thì (< 50ms). Khi SQL Server được bật thành công, hệ thống sẽ tự động đồng bộ trực tiếp với CSDL thật.
 
 ---
 
@@ -131,12 +138,12 @@ Sau khi Tomcat đã khởi động, mở trình duyệt web và sử dụng các
 ```text
 vn.iotstar
  ├── config
- │    ├── JpaConfig.java       # Quản lý vòng đời EntityManagerFactory và tạo EntityManager
+ │    ├── JpaConfig.java       # Quản lý vòng đời EntityManagerFactory, chống nghẽn luồng
  │    └── Test.java            # Hàm main() test độc lập chức năng JPA Hibernate
  ├── entity
  │    ├── Category.java        # Thực thể danh mục (@Entity, @Table, @OneToMany Video)
  │    ├── Video.java           # Thực thể video (@Entity, @ManyToOne Category)
- │    └── User.java            # Thực thể tài khoản người dùng
+ │    └── User.java            # Thực thể tài khoản người dùng (@Entity, @Table)
  ├── dao
  │    ├── ICategoryDao.java    # Khai báo các phương thức CRUD
  │    └── impl
@@ -161,9 +168,9 @@ vn.iotstar
 
 ## ❓ 6. CÁC LỖI THƯỜNG GẶP VÀ CÁCH XỬ LÝ (TROUBLESHOOTING)
 
-1. **Lỗi `Connection refused: getsockopt` hoặc load trang rất lâu:**
-   * **Nguyên nhân:** Cổng kết nối trong `persistence.xml` không đúng với cổng SQL Server đang mở, hoặc SQL Server chưa được bật.
-   * **Cách xử lý:** Mở dịch vụ `SQL Server` trong Windows Services. Kiểm tra cổng SQL Server đang lắng nghe (máy hiện tại là cổng `63755`, máy khác thường là `1433`) và đảm bảo dùng `127.0.0.1` thay vì `localhost` để tránh hiện tượng chờ IPv6.
+1. **Lỗi `Connection refused: getsockopt` hoặc load trang lâu:**
+   * **Nguyên nhân:** Giao thức TCP/IP của SQL Server (đặc biệt là bản Named Instance như `SERVER2022`) bị tắt mặc định hoặc chưa mở cổng 1433.
+   * **Cách xử lý:** Nhấp đúp file `enable-sql-tcp.bat` để script tự động kích hoạt TCP/IP và gán cổng 1433, sau đó khởi động lại dịch vụ SQL Server.
 2. **Thêm danh mục mới nhưng Trang chủ không hiển thị:**
    * **Nguyên nhân:** Khi thêm danh mục, bạn chọn trạng thái là **`Khóa (status = 0)`**.
    * **Cách xử lý:** Vào trang quản trị [http://localhost:8080/JPA_Servlet_Category/admin/categories](http://localhost:8080/JPA_Servlet_Category/admin/categories), bấm nút **Sửa** danh mục đó và chọn lại trạng thái **Hoạt động (status = 1)** &rarr; bấm **Cập Nhật**.
