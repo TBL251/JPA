@@ -3,17 +3,18 @@ package vn.iotstar.util;
 import java.io.File;
 
 /**
- * Lớp chứa hằng số dùng chung trong hệ thống
+ * Lop chua hang so dung chung trong he thong
+ * Ho tro tuong thich da nen tang (chay duoc tren moi o dia C, D, E...)
  */
 public class Constant {
 
-    // Thư mục lưu trữ hình ảnh upload
-    public static final String DIR = "E:\\upload";
+    // Thu muc luu tru hinh anh upload mac dinh
+    public static final String DIR = initUploadDirectory();
 
-    // Tên Cookie Remember Me
+    // Ten Cookie Remember Me
     public static final String COOKIE_REMEMBER = "username";
 
-    // Tên biến lưu trữ trong Session
+    // Ten bien luu tru trong Session
     public static final String SESSION_USERNAME = "username";
 
     public static class Path {
@@ -25,8 +26,28 @@ public class Constant {
     }
 
     /**
-     * Lấy thư mục upload hợp lệ, tự động tạo thư mục nếu chưa tồn tại
+     * Tu dong xac dinh thu muc upload hop le tren moi may tinh:
+     * 1. Uu tien E:/upload neu co o dia E
+     * 2. Neu khong co o dia E, dung C:/upload
+     * 3. Fallback ve {user.home}/upload
      */
+    private static String initUploadDirectory() {
+        File dirE = new File("E:" + File.separator + "upload");
+        File driveE = new File("E:" + File.separator);
+        if (driveE.exists()) {
+            if (!dirE.exists()) {
+                dirE.mkdirs();
+            }
+            return dirE.getAbsolutePath();
+        }
+
+        File dirC = new File("C:" + File.separator + "upload");
+        if (!dirC.exists()) {
+            dirC.mkdirs();
+        }
+        return dirC.getAbsolutePath();
+    }
+
     public static String getUploadDir() {
         File dir = new File(DIR);
         if (!dir.exists()) {
@@ -35,4 +56,3 @@ public class Constant {
         return dir.getAbsolutePath();
     }
 }
-

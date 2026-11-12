@@ -24,13 +24,13 @@ Dự án thực hiện chuyển đổi và nâng cấp kiến trúc từ JDBC th
 
 ---
 
-## 🛠️ 2. YÊU CẦU MÔI TRƯỜNG
+## 🛠️ 2. YÊU CẦU MÔI TRƯỜNG & KHẢ NĂNG TƯƠNG THÍCH ĐA NỀN TẢNG
 
-* **Hệ điều hành:** Windows 10/11
-* **Java Development Kit (JDK):** JDK 17 hoặc JDK 21 (được tích hợp sẵn trong IntelliJ IDEA hoặc cài đặt độc lập)
-* **Web Server:** Apache Tomcat 11.0.x (hỗ trợ Jakarta EE 10 / Servlet 6.1)
-* **Hệ quản trị CSDL:** Microsoft SQL Server 2016/2019/2022
-* **Công cụ build:** Apache Maven 3.8+ (đã tích hợp trong IntelliJ IDEA)
+Dự án được chuẩn hóa theo chuẩn **Maven** quốc tế, **hoàn toàn độc lập và không phụ thuộc cứng vào bất kỳ ổ đĩa nào (ổ C, D, E hay macOS/Linux đều chạy được)**:
+* **JDK:** Java 17 hoặc Java 21 trở lên.
+* **Web Server:** Apache Tomcat 10.1.x hoặc Tomcat 11.0.x (chuẩn Jakarta EE 10 / Servlet 6.0+).
+* **Cơ sở dữ liệu:** Microsoft SQL Server (hoặc MySQL).
+* **Cơ chế lưu trữ ảnh thông minh (`Constant.java`):** Tự động nhận diện ổ đĩa khả dụng trên máy (`E:\upload` &rarr; nếu máy không có ổ E sẽ tự động chuyển sang `C:\upload` &rarr; `{user.home}/upload`).
 
 ---
 
@@ -38,29 +38,27 @@ Dự án thực hiện chuyển đổi và nâng cấp kiến trúc từ JDBC th
 
 ### BƯỚC 1: Chuẩn bị Cơ sở Dữ liệu SQL Server
 1. Mở phần mềm **SQL Server Management Studio (SSMS)**.
-2. Mở file **`database.sql`** có sẵn trong thư mục gốc của dự án (`E:\WEb\JPA\database.sql`).
-3. Bấm **Execute (`F5`)** để tự động:
+2. Mở file **`database.sql`** có sẵn trong thư mục dự án và bấm **Execute (`F5`)** để tự động:
    * Tạo cơ sở dữ liệu `webst2`.
    * Tạo bảng `categories`, `videos`, `users`.
-   * Chèn dữ liệu mẫu cho danh mục và các tài khoản hệ thống.
-4. Kiểm tra thông tin kết nối trong file `src/main/resources/META-INF/persistence.xml`:
+   * Chèn dữ liệu mẫu cho danh mục và tài khoản hệ thống.
+3. Kiểm tra thông tin kết nối trong file `src/main/resources/META-INF/persistence.xml`:
    ```xml
    <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
    <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://127.0.0.1:63755;encrypt=true;trustServerCertificate=true;loginTimeout=5;connectRetryCount=0;databaseName=webst2" />
    <property name="jakarta.persistence.jdbc.user" value="sa" />
    <property name="jakarta.persistence.jdbc.password" value="1234567@a$" />
    ```
-   > **Lưu ý về cổng kết nối (Port):**
-   > * Nếu SQL Server của bạn là bản mặc định (*Default Instance*), hãy đổi cổng thành `1433`.
-   > * Nếu SQL Server là bản đặt tên (*Named Instance*, ví dụ `SERVER2022`), hãy điền cổng tương ứng trên máy bạn (máy tính hiện tại đang dùng cổng `63755`).
-   > * Mật khẩu tài khoản `sa` mặc định là `1234567@a$`.
+   > **Ghi chú về cấu hình kết nối:**
+   > * Cổng kết nối (`port`): Điền cổng SQL Server trên máy của bạn (mặc định là `1433`, hoặc cổng của Named Instance ví dụ `63755`).
+   > * Mật khẩu `sa`: Mặc định là `1234567@a$` (hoặc đổi thành mật khẩu của máy bạn).
 
 ---
 
 ### BƯỚC 2: Kiểm tra kết nối JPA độc lập bằng Console (File `Test.java`)
 Đây là bước kiểm tra cấu hình JPA và Hibernate theo đúng mục 5 trong file đề bài:
-1. Mở dự án trong IDE (IntelliJ IDEA / Eclipse / Antigravity IDE).
-2. Điều hướng đến file: `src/main/java/vn/iotstar/config/Test.java`.
+1. Mở dự án trong IDE (IntelliJ IDEA / Eclipse / VS Code).
+2. Mở file: `src/main/java/vn/iotstar/config/Test.java`.
 3. Nhấp chuột phải vào file &rarr; chọn **Run 'Test.main()'** (hoặc tổ hợp phím `Ctrl + Shift + F10`).
 4. **Kết quả mong đợi:** Console sẽ hiển thị câu lệnh SQL của Hibernate và thông báo:
    ```text
@@ -74,26 +72,33 @@ Dự án thực hiện chuyển đổi và nâng cấp kiến trúc từ JDBC th
 
 ---
 
-### BƯỚC 3: Chạy ứng dụng Web trên Apache Tomcat 11
+### BƯỚC 3: Chạy ứng dụng Web trên Tomcat (Lựa chọn 1 trong 3 cách)
 
-#### 👉 Cách A: Chạy tự động bằng Script Batch (Khuyên dùng)
-Dự án đã được tích hợp sẵn 2 file script tự động hóa:
-1. **Đóng gói file WAR:**
-   * Nhấp đúp chuột vào file **`build.bat`**.
-   * Script sẽ tự động gọi Maven biên dịch 22 file mã nguồn, đóng gói thành tệp `target\JPA_Servlet_Category.war` và tự động sao chép sang thư mục `E:\apache-tomcat-11.0.27\webapps\`.
-2. **Khởi động Apache Tomcat:**
-   * Nhấp đúp chuột vào file **`run-tomcat.bat`**.
-   * Cửa sổ Tomcat sẽ xuất hiện và load ứng dụng trong khoảng vài giây.
-3. **Mở trình duyệt web:**
-   * Truy cập các đường dẫn được liệt kê ở mục 4 bên dưới.
-
-#### 👉 Cách B: Chạy qua giao diện IntelliJ IDEA (Smart Tomcat)
-1. Trong IntelliJ, vào **Run** &rarr; **Edit Configurations...** &rarr; Bấm dấu `+` &rarr; Chọn **Smart Tomcat**.
-2. Thiết lập các thông số:
-   * **Tomcat Server:** Chọn thư mục `E:\apache-tomcat-11.0.27`.
-   * **Deployment Directory:** Chọn thư mục `E:\WEb\JPA\src\main\webapp`.
+#### 🌟 Cách 1: Chạy bằng Smart Tomcat trong IntelliJ IDEA (Khuyên dùng khi chấm bài trên mọi máy tính)
+Cách này hoạt động trên **mọi máy tính**, bất kể Tomcat được cài ở ổ đĩa `C:`, `D:`, hay `E:`:
+1. Mở dự án bằng **IntelliJ IDEA**.
+2. Cài đặt plugin **Smart Tomcat** (nếu chưa có).
+3. Vào **Run** &rarr; **Edit Configurations...** &rarr; Bấm `+` &rarr; Chọn **Smart Tomcat**.
+4. Thiết lập:
+   * **Tomcat Server:** Trỏ đến thư mục cài Tomcat trên máy bạn (ví dụ `C:\apache-tomcat-11...` hoặc `E:\apache-tomcat-11...`).
+   * **Deployment Directory:** Trỏ đến thư mục `src/main/webapp` của dự án.
    * **Context Path:** Điền `/JPA_Servlet_Category`.
-3. Bấm **Apply** &rarr; **Run**.
+5. Bấm **Run** để khởi động.
+
+#### 🌟 Cách 2: Chạy tự động bằng Script Batch (`build.bat` & `run-tomcat.bat`)
+Script được thiết kế tự động dò tìm môi trường:
+* Tự động phát hiện biến môi trường `%JAVA_HOME%` và `%CATALINA_HOME%`.
+* Tự động dò tìm thư mục Tomcat trên các ổ đĩa `E:\`, `C:\`, `D:\`.
+1. Nhấp đúp file **`build.bat`**: Script sẽ gọi Maven đóng gói `JPA_Servlet_Category.war` và tự copy vào thư mục `webapps` của Tomcat.
+2. Nhấp đúp file **`run-tomcat.bat`**: Script tự động tìm và bật Tomcat.
+
+#### 🌟 Cách 3: Chạy bằng dòng lệnh Maven chuẩn (Dành cho mọi hệ điều hành Windows/Mac/Linux)
+1. Mở Terminal tại thư mục dự án và chạy:
+   ```bash
+   mvn clean package -DskipTests
+   ```
+2. Lấy file WAR được tạo tại `target/JPA_Servlet_Category.war` dán vào thư mục `webapps/` của Apache Tomcat trên máy bạn.
+3. Khởi động Tomcat và mở trình duyệt.
 
 ---
 
@@ -149,7 +154,7 @@ vn.iotstar
  │    ├── LoginController.java         # Servlet đăng nhập, Cookie Remember Me
  │    └── LogoutController.java        # Servlet hủy session và đăng xuất
  └── util
-      └── Constant.java                # Hằng số hệ thống (thư mục upload E:\upload, Cookie...)
+      └── Constant.java                # Tự động nhận diện thư mục upload (E:\upload, C:\upload...)
 ```
 
 ---
@@ -158,12 +163,12 @@ vn.iotstar
 
 1. **Lỗi `Connection refused: getsockopt` hoặc load trang rất lâu:**
    * **Nguyên nhân:** Cổng kết nối trong `persistence.xml` không đúng với cổng SQL Server đang mở, hoặc SQL Server chưa được bật.
-   * **Cách xử lý:** Mở dịch vụ `SQL Server (SERVER2022)` trong Windows Services. Kiểm tra cổng SQL Server đang lắng nghe (máy hiện tại là cổng `63755`) và đảm bảo dùng `127.0.0.1` thay vì `localhost` để tránh hiện tượng chờ IPv6.
+   * **Cách xử lý:** Mở dịch vụ `SQL Server` trong Windows Services. Kiểm tra cổng SQL Server đang lắng nghe (máy hiện tại là cổng `63755`, máy khác thường là `1433`) và đảm bảo dùng `127.0.0.1` thay vì `localhost` để tránh hiện tượng chờ IPv6.
 2. **Thêm danh mục mới nhưng Trang chủ không hiển thị:**
    * **Nguyên nhân:** Khi thêm danh mục, bạn chọn trạng thái là **`Khóa (status = 0)`**.
    * **Cách xử lý:** Vào trang quản trị [http://localhost:8080/JPA_Servlet_Category/admin/categories](http://localhost:8080/JPA_Servlet_Category/admin/categories), bấm nút **Sửa** danh mục đó và chọn lại trạng thái **Hoạt động (status = 1)** &rarr; bấm **Cập Nhật**.
-3. **Hình ảnh upload không hiển thị:**
-   * Đảm bảo thư mục `E:\upload` tồn tại trên máy (hệ thống sẽ tự động tạo thư mục này khi chạy). File ảnh tải lên được phục vụ qua Servlet `/image?fname=...`.
+3. **Hình ảnh upload:**
+   * Thư mục upload ảnh được tự động tạo linh hoạt tại `E:\upload` hoặc `C:\upload` tùy theo ổ đĩa khả dụng trên máy tính. File ảnh tải lên được phục vụ thông qua Servlet `/image?fname=...`.
 
 ---
 
