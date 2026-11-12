@@ -28,21 +28,25 @@ public class LoginController extends HttpServlet {
             return;
         }
 
-        Cookie[] cookies = req.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (Constant.COOKIE_REMEMBER.equals(cookie.getName())) {
-                    String username = cookie.getValue();
-                    User user = userService.get(username);
-                    if (user != null) {
-                        session = req.getSession(true);
-                        session.setAttribute("account", user);
-                        session.setAttribute("username", username);
-                        resp.sendRedirect(req.getContextPath() + "/waiting");
-                        return;
+        try {
+            Cookie[] cookies = req.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (Constant.COOKIE_REMEMBER.equals(cookie.getName())) {
+                        String username = cookie.getValue();
+                        User user = userService.get(username);
+                        if (user != null) {
+                            session = req.getSession(true);
+                            session.setAttribute("account", user);
+                            session.setAttribute("username", username);
+                            resp.sendRedirect(req.getContextPath() + "/waiting");
+                            return;
+                        }
                     }
                 }
             }
+        } catch (Exception e) {
+            System.err.println("[LOGIN GET] Cookie check failed: " + e.getMessage());
         }
 
         req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
@@ -65,20 +69,26 @@ public class LoginController extends HttpServlet {
             return;
         }
 
-        User user = userService.login(username.trim(), password.trim());
+        try {
+            User user = userService.login(username.trim(), password.trim());
 
-        if (user != null) {
-            HttpSession session = req.getSession(true);
-            session.setAttribute("account", user);
-            session.setAttribute("username", user.getUserName());
+            if (user != null) {
+                HttpSession session = req.getSession(true);
+                session.setAttribute("account", user);
+                session.setAttribute("username", user.getUserName());
 
-            if (isRememberMe) {
-                saveRememberMe(resp, user.getUserName());
+                if (isRememberMe) {
+                    saveRememberMe(resp, user.getUserName());
+                }
+
+                resp.sendRedirect(req.getContextPath() + "/waiting");
+            } else {
+                req.setAttribute("alert", "Tài khoản hoặc mật khẩu không đúng! (Dùng admin/123456 hoặc user/123456 khi CSDL đang khởi tạo)");
+                req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
             }
-
-            resp.sendRedirect(req.getContextPath() + "/waiting");
-        } else {
-            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không đúng!");
+        } catch (Exception e) {
+            System.err.println("[LOGIN ERROR] " + e.getMessage());
+            req.setAttribute("alert", "Lỗi xử lý đăng nhập hoặc chưa kết nối được CSDL: " + e.getMessage());
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
         }
     }
@@ -90,4 +100,3 @@ public class LoginController extends HttpServlet {
         response.addCookie(cookie);
     }
 }
-

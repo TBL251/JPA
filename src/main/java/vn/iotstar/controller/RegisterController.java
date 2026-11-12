@@ -39,26 +39,31 @@ public class RegisterController extends HttpServlet {
             return;
         }
 
-        if (userService.checkExistUsername(username.trim())) {
-            req.setAttribute("alert", "Tên đăng nhập đã tồn tại!");
-            req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
-            return;
-        }
+        try {
+            if (userService.checkExistUsername(username.trim())) {
+                req.setAttribute("alert", "Tên đăng nhập đã tồn tại!");
+                req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
+                return;
+            }
 
-        if (email != null && !email.trim().isEmpty() && userService.checkExistEmail(email.trim())) {
-            req.setAttribute("alert", "Email đã tồn tại!");
-            req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
-            return;
-        }
+            if (email != null && !email.trim().isEmpty() && userService.checkExistEmail(email.trim())) {
+                req.setAttribute("alert", "Email đã tồn tại!");
+                req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
+                return;
+            }
 
-        boolean success = userService.register(username.trim(), password.trim(), email, fullname, phone);
-        if (success) {
-            req.setAttribute("message", "Đăng ký thành công! Vui lòng đăng nhập.");
-            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
-        } else {
-            req.setAttribute("alert", "Đăng ký thất bại!");
+            boolean success = userService.register(username.trim(), password.trim(), email, fullname, phone);
+            if (success) {
+                req.setAttribute("message", "Đăng ký thành công! Vui lòng đăng nhập.");
+                req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            } else {
+                req.setAttribute("alert", "Đăng ký thất bại hoặc CSDL chưa sẵn sàng!");
+                req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
+            }
+        } catch (Exception e) {
+            System.err.println("[REGISTER ERROR] " + e.getMessage());
+            req.setAttribute("alert", "Lỗi xử lý đăng ký hoặc chưa kết nối CSDL: " + e.getMessage());
             req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
         }
     }
 }
-
