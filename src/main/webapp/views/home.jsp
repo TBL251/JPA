@@ -11,7 +11,7 @@
         .navbar { background: #0f172a; color: #fff; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; }
         .navbar a { color: #cbd5e1; text-decoration: none; margin-left: 20px; font-weight: 500; }
         .navbar a:hover { color: #fff; }
-        .hero { text-align: center; padding: 50px 20px; background: linear-gradient(135deg, #1e293b, #0f172a); color: #fff; }
+        .hero { text-align: center; padding: 45px 20px; background: linear-gradient(135deg, #1e293b, #0f172a); color: #fff; }
         .hero h1 { font-size: 32px; margin-bottom: 12px; }
         .hero p { color: #94a3b8; font-size: 16px; margin-bottom: 24px; }
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
@@ -24,6 +24,7 @@
         .card-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #0f172a; }
         .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
         .badge-success { background: #dcfce7; color: #166534; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
         .btn { display: inline-block; padding: 8px 16px; background: #2563eb; color: #fff; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; margin-top: 10px; }
     </style>
 </head>
@@ -62,7 +63,7 @@
     </div>
 
     <div class="container">
-        <div class="section-title">Danh Sách Danh Mục Đang Hoạt Động</div>
+        <div class="section-title">Danh Sách Danh Mục Sản Phẩm</div>
         <div class="grid">
             <c:choose>
                 <c:when test="${empty listcate}">
@@ -72,27 +73,32 @@
                 </c:when>
                 <c:otherwise>
                     <c:forEach items="${listcate}" var="c">
-                        <c:if test="${c.status == 1}">
-                            <div class="card">
+                        <div class="card">
+                            <c:choose>
+                                <c:when test="${c.images != null && c.images.startsWith('https')}">
+                                    <c:url value="${c.images}" var="imgUrl"/>
+                                </c:when>
+                                <c:when test="${c.images != null && !empty c.images}">
+                                    <c:url value="/image?fname=${c.images}" var="imgUrl"/>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:url value="https://placehold.co/260x180?text=Category" var="imgUrl"/>
+                                </c:otherwise>
+                            </c:choose>
+                            <img src="${imgUrl}" alt="${c.categoryname}" 
+                                 onerror="this.onerror=null; this.src='https://placehold.co/260x180?text=Category';"/>
+                            <div class="card-body">
+                                <div class="card-title">${c.categoryname}</div>
                                 <c:choose>
-                                    <c:when test="${c.images != null && c.images.startsWith('https')}">
-                                        <c:url value="${c.images}" var="imgUrl"/>
-                                    </c:when>
-                                    <c:when test="${c.images != null && !empty c.images}">
-                                        <c:url value="/image?fname=${c.images}" var="imgUrl"/>
+                                    <c:when test="${c.status == 1}">
+                                        <span class="badge badge-success">&#10003; Hoạt động</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <c:url value="https://placehold.co/260x180?text=Category" var="imgUrl"/>
+                                        <span class="badge badge-danger">&#9679; Tạm khóa</span>
                                     </c:otherwise>
                                 </c:choose>
-                                <img src="${imgUrl}" alt="${c.categoryname}" 
-                                     onerror="this.onerror=null; this.src='https://placehold.co/260x180?text=Category';"/>
-                                <div class="card-body">
-                                    <div class="card-title">${c.categoryname}</div>
-                                    <span class="badge badge-success">&#10003; Đang mở bán</span>
-                                </div>
                             </div>
-                        </c:if>
+                        </div>
                     </c:forEach>
                 </c:otherwise>
             </c:choose>
@@ -100,4 +106,3 @@
     </div>
 </body>
 </html>
-
