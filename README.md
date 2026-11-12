@@ -1,105 +1,105 @@
-# BÁO CÁO BÀI TẬP: CHUYỂN ĐỔI BÀI TẬP 01 SANG CÔNG NGHỆ JPA 3.0 & JAKARTA EE 10
-## HỆ THỐNG QUẢN LÝ DANH MỤC SẢN PHẨM (CRUD CATEGORY) VÀ PHÂN QUYỀN NGƯỜI DÙNG
+# Báo cáo bài tập: Chuyển đổi Bài tập 01 sang JPA 3.0 và Jakarta EE 10
+## Hệ thống quản lý danh mục sản phẩm (CRUD Category) và phân quyền người dùng
 
 ---
 
-### THÔNG TIN CHUNG
-* **Trường:** Đại học Sư phạm Kỹ thuật TP.HCM (HCMUTE)
-* **Khoa:** Công nghệ Thông tin
-* **Bộ môn:** Kỹ thuật Phần mềm / Công nghệ Web
-* **Môn học:** Lập trình Web
-* **Sinh viên thực hiện:** Lê Bá Tám
-* **Mã số sinh viên (MSSV):** 24110055
-* **Link Repository GitHub (Nộp LMS):** [https://github.com/TBL251/JPA.git](https://github.com/TBL251/JPA.git)
+### Thông tin chung
+* Trường: Đại học Sư phạm Kỹ thuật TP.HCM (HCMUTE)
+* Khoa: Công nghệ Thông tin
+* Bộ môn: Kỹ thuật Phần mềm / Công nghệ Web
+* Môn học: Lập trình Web
+* Sinh viên thực hiện: Lê Bá Tám
+* Mã số sinh viên (MSSV): 24110055
+* Đường dẫn repository GitHub: [https://github.com/TBL251/JPA.git](https://github.com/TBL251/JPA.git)
 
 ---
 
-## 📑 MỤC LỤC CHI TIẾT
-1. [Giới Thiệu và Mục Tiêu Đề Bài](#1-giới-thiệu-và-mục-tiêu-đề-bài)
-2. [Ngăn Xếp Công Nghệ & Khả Năng Tương Thích Đa Nền Tảng](#2-ngăn-xếp-công-nghệ--khả-năng-tương-thích-đa-nền-tảng)
-3. [Kiến Trúc Hệ Thống & Cấu Trúc Mã Nguồn](#3-kiến-trúc-hệ-thống--cấu-trúc-mã-nguồn)
-4. [Mô Hình Thực Thể Dữ Liệu (JPA Entities & Relationships)](#4-mô-hình-thực-thể-dữ-liệu-jpa-entities--relationships)
-5. [Chi Tiết Tầng Xử Lý Dữ Liệu (DAO & Service Layers)](#5-chi-tiết-tầng-xử-lý-dữ-liệu-dao--service-layers)
-6. [Hướng Dẫn Thiết Lập Cơ Sở Dữ Liệu SQL Server](#6-hướng-dẫn-thiết-lập-cơ-sở-dữ-liệu-sql-server)
-7. [Kiểm Thử Kết Nối JPA Độc Lập Bằng Console (Test.java)](#7-kiểm-thử-kết-nối-jpa-độc-lập-bằng-console-testjava)
-8. [Hướng Dẫn Chi Tiết 3 Cách Khởi Động Ứng Dụng Trên Tomcat](#8-hướng-dẫn-chi-tiết-3-cách-khởi-động-ứng-dụng-trên-tomcat)
-9. [Bảng Điều Hướng URL Hệ Thống & Tài Khoản Kiểm Thử](#9-bảng-điều-hướng-url-hệ-thống--tài-khoản-kiểm-thử)
-10. [Cơ Chế Tải Siêu Tốc & Chống Sập Hệ Thống (Zero-Downtime Safe Mode)](#10-cơ-chế-tải-siêu-tốc--chống-sập-hệ-thống-zero-downtime-safe-mode)
-11. [Hướng Dẫn Xử Lý Sự Cố Thường Gặp (Troubleshooting Guide)](#11-hướng-dẫn-xử-lý-sự-cố-thường-gặp-troubleshooting-guide)
+## Mục lục
+1. [Giới thiệu và mục tiêu đề bài](#1-giới-thiệu-và-mục-tiêu-đề-bài)
+2. [Công nghệ sử dụng](#2-công-nghệ-sử-dụng)
+3. [Kiến trúc hệ thống và cấu trúc mã nguồn](#3-kiến-trúc-hệ-thống-và-cấu-trúc-mã-nguồn)
+4. [Mô hình thực thể dữ liệu](#4-mô-hình-thực-thể-dữ-liệu)
+5. [Chi tiết tầng xử lý dữ liệu](#5-chi-tiết-tầng-xử-lý-dữ-liệu)
+6. [Hướng dẫn thiết lập cơ sở dữ liệu SQL Server](#6-hướng-dẫn-thiết-lập-cơ-sở-dữ-liệu-sql-server)
+7. [Kiểm thử kết nối JPA độc lập (Test.java)](#7-kiểm-thử-kết-nối-jpa-độc-lập-testjava)
+8. [Hướng dẫn khởi động ứng dụng trên Tomcat](#8-hướng-dẫn-khởi-động-ứng-dụng-trên-tomcat)
+9. [Bảng điều hướng URL và tài khoản kiểm thử](#9-bảng-điều-hướng-url-và-tài-khoản-kiểm-thử)
+10. [Cơ chế xử lý timeout và dữ liệu dự phòng](#10-cơ-chế-xử-lý-timeout-và-dữ-liệu-dự-phòng)
+11. [Hướng dẫn xử lý sự cố thường gặp](#11-hướng-dẫn-xử-lý-sự-cố-thường-gặp)
 
 ---
 
-## 1. GIỚI THIỆU VÀ MỤC TIÊU ĐỀ BÀI
+## 1. Giới thiệu và mục tiêu đề bài
 
-Dự án này thực hiện việc tái cấu trúc và hiện đại hóa toàn bộ ứng dụng Web từ **JDBC thuần của Bài tập 01** sang công nghệ **JPA 3.0 (Jakarta Persistence)** kết hợp với **Hibernate ORM 6.x** và chuẩn **Jakarta EE 10**.
+Dự án chuyển đổi ứng dụng web từ JDBC thuần (Bài tập 01) sang JPA 3.0 (Jakarta Persistence), sử dụng Hibernate ORM 6.x trên nền tảng Jakarta EE 10.
 
-Dự án đáp ứng đầy đủ và chuẩn xác các nội dung từ 2 tài liệu hướng dẫn của giảng viên:
+Các nội dung được triển khai theo hai tài liệu hướng dẫn:
 
 ### A. Yêu cầu tài liệu "Cấu hình và test JPA":
-* Khai báo đầy đủ các dependency tiêu chuẩn trong `pom.xml`: Hibernate ORM Core 6.x, Jakarta Persistence API 3.x, Microsoft SQL Server JDBC Driver.
+* Khai báo dependency trong `pom.xml`: Hibernate ORM Core 6.x, Jakarta Persistence API 3.x, Microsoft SQL Server JDBC Driver.
 * Cấu hình tệp `META-INF/persistence.xml` chuẩn JPA 3.0 kết nối cơ sở dữ liệu `webst2` trên SQL Server.
-* Định nghĩa Entity `Category` và `Video` với các annotation JPA: `@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@NamedQuery`.
-* Thiết lập mối quan hệ 1 - Nhiều (1 Category có nhiều Video) với `@OneToMany(mappedBy = "category")` và `@ManyToOne` kèm `@JoinColumn(name = "categoryId")`.
-* Xây dựng lớp cấu hình `JpaConfig.java` quản lý tập trung `EntityManagerFactory` theo mô hình Singleton.
-* Xây dựng chương trình `Test.java` có hàm `main()` thực thi kiểm thử độc lập: mở Transaction, tự động cập nhật bảng trong CSDL (`hbm2ddl.auto=update`), chèn mới thực thể Category và Video rồi commit thành công.
+* Định nghĩa Entity `Category` và `Video` với các chú thích JPA: `@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@NamedQuery`.
+* Thiết lập quan hệ 1-Nhiều (một Category có nhiều Video) với `@OneToMany(mappedBy = "category")` và `@ManyToOne` kèm `@JoinColumn(name = "categoryId")`.
+* Xây dựng lớp `JpaConfig.java` quản lý `EntityManagerFactory` theo mô hình Singleton.
+* Xây dựng chương trình `Test.java` có hàm `main()` để kiểm thử độc lập: mở Transaction, cập nhật cấu trúc bảng (`hbm2ddl.auto=update`), chèn bản ghi mẫu cho Category và Video rồi xác nhận giao dịch.
 
 ### B. Yêu cầu tài liệu "Hướng dẫn CRUD với JPA3.0 và Jakarta 6.0":
-* **Tầng DAO (`ICategoryDao` & `CategoryDao`)**: Thao tác hoàn toàn qua JPA `EntityManager` và câu lệnh JPQL. Cung cấp đủ 9 phương thức nghiệp vụ CRUD:
-  1. `insert(Category category)`: Thêm mới danh mục vào CSDL.
+* Tầng DAO (`ICategoryDao` và `CategoryDao`): Thao tác qua `EntityManager` và truy vấn JPQL, cung cấp 9 phương thức CRUD:
+  1. `insert(Category category)`: Thêm danh mục mới vào CSDL.
   2. `update(Category category)`: Cập nhật thông tin danh mục.
-  3. `delete(int cateid)`: Xóa danh mục theo mã định danh ID.
-  4. `findById(int cateid)`: Truy vấn danh mục theo khóa chính ID.
-  5. `findByCategoryname(String name)`: Tìm kiếm danh mục theo tên chính xác.
-  6. `findAll()`: Lấy danh sách toàn bộ danh mục thông qua `@NamedQuery("Category.findAll")`.
-  7. `searchByName(String catname)`: Tìm kiếm danh mục gần đúng theo từ khóa tên chứa chuỗi ký tự (`LIKE %...%`).
+  3. `delete(int cateid)`: Xóa danh mục theo mã ID.
+  4. `findById(int cateid)`: Truy vấn danh mục theo khóa chính.
+  5. `findByCategoryname(String name)`: Tìm danh mục theo tên chính xác.
+  6. `findAll()`: Lấy danh sách toàn bộ danh mục qua `@NamedQuery("Category.findAll")`.
+  7. `searchByName(String catname)`: Tìm danh mục theo từ khóa (`LIKE %...%`).
   8. `findAll(int page, int pagesize)`: Phân trang danh mục kết hợp `setFirstResult()` và `setMaxResults()`.
-  9. `count()`: Đếm tổng số lượng danh mục có trong cơ sở dữ liệu (`SELECT count(c) FROM Category c`).
-* **Tầng Service (`ICategoryService` & `CategoryServiceImpl`)**: Đóng gói các quy tắc nghiệp vụ danh mục.
-* **Tầng Controller (`CategoryController`)**: Servlet quản trị điều hướng các endpoint:
-  * `/admin/categories` & `/admin/category/list`: Hiển thị bảng danh sách danh mục.
-  * `/admin/category/add` & `/admin/category/insert`: Form và hành động thêm danh mục mới, hỗ trợ upload ảnh qua `@MultipartConfig`.
-  * `/admin/category/edit` & `/admin/category/update`: Form và hành động chỉnh sửa danh mục, hỗ trợ thay đổi ảnh hoặc giữ nguyên ảnh cũ.
+  9. `count()`: Đếm tổng số danh mục (`SELECT count(c) FROM Category c`).
+* Tầng Service (`ICategoryService` và `CategoryServiceImpl`): Đóng gói logic nghiệp vụ danh mục.
+* Tầng Controller (`CategoryController`): Servlet điều hướng các endpoint:
+  * `/admin/categories` và `/admin/category/list`: Hiển thị danh sách danh mục.
+  * `/admin/category/add` và `/admin/category/insert`: Form và xử lý thêm danh mục, hỗ trợ tải file ảnh qua `@MultipartConfig`.
+  * `/admin/category/edit` và `/admin/category/update`: Form và xử lý cập nhật danh mục.
   * `/admin/category/delete`: Xóa danh mục.
-* **Tầng Giao diện View (JSP)**: Bộ giao diện quản trị Bootstrap/CSS hiện đại: `category-list.jsp`, `category-add.jsp`, `category-edit.jsp`.
+* Giao diện (JSP): Các trang quản trị `category-list.jsp`, `category-add.jsp`, `category-edit.jsp`.
 
-### C. Nâng cấp toàn diện các tính năng Bài tập 01 sang JPA 3.0:
-* **Entity & DAO User**: Chuyển đổi bảng `users` sang Entity `User.java`, xây dựng DAO `UserDaoImpl.java` và Service `UserServiceImpl.java` thao tác qua `EntityManager`.
-* **Đăng nhập & Đăng ký**: Hỗ trợ đăng nhập, đăng ký tài khoản mới, mã hóa mật khẩu, ghi nhớ đăng nhập qua Cookie (*Remember Me*).
-* **Phân quyền người dùng (Role-based Authorization)**:
-  * Quản trị viên (`roleid = 1`): Sau khi đăng nhập được tự động chuyển hướng qua servlet `/waiting` vào thẳng khu vực Quản trị danh mục (`/admin/categories`).
-  * Người dùng thường (`roleid = 2` hoặc `3`): Sau khi đăng nhập được chuyển về Trang chủ mua sắm (`/home`), ẩn hoàn toàn nút truy cập Quản trị.
-* **Phục vụ và hiển thị hình ảnh (`DownloadImageController`)**: Servlet phục vụ ảnh qua URL `/image?fname=...`, hỗ trợ cả ảnh upload lưu cục bộ và ảnh link trực tiếp từ Internet.
-
----
-
-## 2. NGĂN XẾP CÔNG NGHỆ & KHẢ NĂNG TƯƠNG THÍCH ĐA NỀN TẢNG
-
-Dự án được chuẩn hóa theo tiêu chuẩn **Maven** quốc tế, đảm bảo **hoàn toàn độc lập môi trường, chạy mượt mà trên mọi máy tính (kể cả máy không có ổ E, chạy trên ổ C, D, hay hệ điều hành Windows, macOS, Linux)**:
-
-* **Ngôn ngữ lập trình:** Java 17 LTS / Java 21 LTS.
-* **Nền tảng Web:** Jakarta EE 10 (Jakarta Servlet 6.1, Jakarta JSP 4.0, Jakarta JSTL 3.0).
-* **Web Server:** Apache Tomcat 10.1.x hoặc Apache Tomcat 11.0.x (yêu cầu chuẩn Jakarta EE).
-* **JPA Provider:** Hibernate ORM 6.5.2.Final, Jakarta Persistence API 3.1.0, Hibernate Validator 8.0.
-* **Hệ quản trị CSDL:** Microsoft SQL Server 2016 / 2019 / 2022 (hỗ trợ cả MySQL).
-* **Trình điều khiển JDBC:** Microsoft JDBC Driver for SQL Server 12.6.1 (`mssql-jdbc`).
-* **Tiện ích đa phương tiện:** Apache Commons-IO 2.16.1 hỗ trợ upload và đọc ghi file nhị phân.
-* **Cơ chế lưu trữ ảnh thông minh (`Constant.java`):** Tự động phát hiện ổ đĩa khả dụng theo thứ tự ưu tiên: `E:\upload` &rarr; nếu máy không có ổ E sẽ tự động chuyển sang `C:\upload` &rarr; thư mục người dùng `{user.home}/upload`.
+### C. Chuyển đổi các chức năng từ Bài tập 01 sang JPA 3.0:
+* Quản lý người dùng: Chuyển đổi bảng `users` sang Entity `User.java`, xây dựng DAO `UserDaoImpl.java` và Service `UserServiceImpl.java` thao tác qua `EntityManager`.
+* Đăng nhập và đăng ký: Xác thực tài khoản, đăng ký thành viên mới, mã hóa mật khẩu, ghi nhớ phiên đăng nhập bằng Cookie.
+* Phân quyền người dùng:
+  * Quản trị viên (`roleid = 1`): Chuyển hướng qua servlet `/waiting` vào trang quản trị danh mục (`/admin/categories`).
+  * Người dùng thường (`roleid = 2` hoặc `3`): Chuyển hướng về trang chủ (`/home`), không hiển thị liên kết quản trị.
+* Phục vụ hình ảnh (`DownloadImageController`): Servlet trả về ảnh qua endpoint `/image?fname=...`, hỗ trợ ảnh lưu cục bộ và ảnh liên kết từ internet.
 
 ---
 
-## 3. KIẾN TRÚC HỆ THỐNG & CẤU TRÚC MÃ NGUỒN
+## 2. Công nghệ sử dụng
 
-Dự án áp dụng mô hình kiến trúc phân tầng chuẩn mực **MVC (Model - View - Controller)** kết hợp **Service - DAO**:
+Dự án quản lý thư viện và vòng đời bản dựng bằng Maven:
+
+* Ngôn ngữ: Java 17 LTS hoặc Java 21 LTS.
+* Nền tảng web: Jakarta EE 10 (Jakarta Servlet 6.1, Jakarta JSP 4.0, Jakarta JSTL 3.0).
+* Máy chủ web: Apache Tomcat 10.1.x hoặc 11.0.x.
+* JPA Provider: Hibernate ORM 6.5.2.Final, Jakarta Persistence API 3.1.0, Hibernate Validator 8.0.
+* Hệ quản trị cơ sở dữ liệu: Microsoft SQL Server (tương thích các phiên bản 2016, 2019, 2022).
+* Trình điều khiển JDBC: Microsoft JDBC Driver for SQL Server 12.6.1 (`mssql-jdbc`).
+* Thư viện tiện ích: Apache Commons-IO 2.16.1 hỗ trợ xử lý luồng dữ liệu file.
+* Đường dẫn lưu trữ ảnh (`Constant.java`): Tự động kiểm tra và sử dụng thư mục theo thứ tự: `E:\upload`, `C:\upload` hoặc `{user.home}/upload`.
+
+---
+
+## 3. Kiến trúc hệ thống và cấu trúc mã nguồn
+
+Dự án tổ chức theo mô hình MVC kết hợp Service và DAO:
 
 ```text
 E:\WEb\JPA
 ├── pom.xml                                    # File cấu hình thư viện Maven chuẩn Jakarta EE 10
 ├── database.sql                               # Script SQL tạo CSDL webst2 và bảng dữ liệu mẫu
-├── build.bat                                  # Script tự động biên dịch và copy file WAR vào Tomcat
-├── run-tomcat.bat                             # Script tự động tìm và khởi động Apache Tomcat
-├── enable-sql-tcp.bat                         # Script tự động kích hoạt TCP/IP và cổng 1433 cho SQL Server
-├── push-github.bat                            # Script 1-click đẩy toàn bộ mã nguồn lên GitHub
-├── README.md                                  # Báo cáo kỹ thuật chi tiết của dự án
+├── build.bat                                  # Script biên dịch và sao chép file WAR vào Tomcat
+├── run-tomcat.bat                             # Script tìm kiếm và khởi động Apache Tomcat
+├── enable-sql-tcp.bat                         # Script cấu hình TCP/IP cổng 1433 cho SQL Server
+├── push-github.bat                            # Script đồng bộ mã nguồn lên GitHub
+├── README.md                                  # Báo cáo kỹ thuật dự án
 │
 ├── src\main\resources
 │   └── META-INF
@@ -107,56 +107,56 @@ E:\WEb\JPA
 │
 ├── src\main\java\vn\iotstar
 │   ├── config
-│   │   ├── JpaConfig.java                     # Quản lý EntityManagerFactory và chống nghẽn luồng
-│   │   └── Test.java                          # Hàm main() kiểm thử độc lập JPA & Hibernate
+│   │   ├── JpaConfig.java                     # Khởi tạo EntityManagerFactory và xử lý timeout
+│   │   └── Test.java                          # Kiểm thử kết nối JPA và Hibernate bằng hàm main()
 │   │
 │   ├── entity
 │   │   ├── Category.java                      # Entity danh mục (@OneToMany Video)
 │   │   ├── Video.java                         # Entity video (@ManyToOne Category)
-│   │   └── User.java                          # Entity tài khoản người dùng (@Entity, @Table)
+│   │   └── User.java                          # Entity tài khoản người dùng
 │   │
 │   ├── dao
 │   │   ├── ICategoryDao.java                  # Interface khai báo 9 phương thức CRUD Category
 │   │   ├── UserDao.java                       # Interface xác thực tài khoản
 │   │   └── impl
-│   │       ├── CategoryDao.java               # Triển khai CRUD Category bằng EntityManager & JPQL
-│   │       └── UserDaoImpl.java               # Triển khai xác thực người dùng bằng JPA
+│   │       ├── CategoryDao.java               # Triển khai CRUD Category qua EntityManager
+│   │       └── UserDaoImpl.java               # Triển khai xác thực tài khoản qua JPA
 │   │
 │   ├── service
 │   │   ├── ICategoryService.java
 │   │   ├── UserService.java
 │   │   └── impl
 │   │       ├── CategoryServiceImpl.java       # Xử lý logic nghiệp vụ Category
-│   │       └── UserServiceImpl.java           # Xử lý đăng nhập, đăng ký, mã hóa
+│   │       └── UserServiceImpl.java           # Xử lý xác thực, đăng ký và mật khẩu
 │   │
 │   ├── controller
 │   │   ├── CategoryController.java            # Servlet CRUD Category (/admin/category/...)
-│   │   ├── DownloadImageController.java       # Servlet phục vụ hiển thị hình ảnh (/image?fname=...)
+│   │   ├── DownloadImageController.java       # Servlet phục vụ file ảnh (/image?fname=...)
 │   │   ├── HomeController.java                # Servlet hiển thị danh mục ra trang chủ (/home)
-│   │   ├── LoginController.java               # Servlet Đăng nhập, Cookie Remember Me (/login)
-│   │   ├── RegisterController.java            # Servlet Đăng ký tài khoản (/register)
-│   │   ├── LogoutController.java              # Servlet Hủy phiên làm việc (/logout)
-│   │   └── WaitingController.java             # Servlet Điều hướng phân quyền vai trò (/waiting)
+│   │   ├── LoginController.java               # Servlet đăng nhập và ghi nhớ phiên (/login)
+│   │   ├── RegisterController.java            # Servlet đăng ký tài khoản (/register)
+│   │   ├── LogoutController.java              # Servlet kết thúc phiên làm việc (/logout)
+│   │   └── WaitingController.java             # Servlet điều hướng phân quyền (/waiting)
 │   │
 │   └── util
-│       └── Constant.java                      # Khai báo cấu hình và tự động dò tìm thư mục upload
+│       └── Constant.java                      # Khai báo đường dẫn và định vị thư mục upload
 │
 └── src\main\webapp
     ├── WEB-INF
-    │   └── web.xml                            # Cấu hình ứng dụng Web chuẩn Servlet 6.1
+    │   └── web.xml                            # Cấu hình servlet theo chuẩn Servlet 6.1
     └── views
-        ├── home.jsp                           # Giao diện Trang chủ mua sắm & hiển thị phân quyền
-        ├── login.jsp                          # Giao diện Đăng nhập hệ thống
-        ├── register.jsp                       # Giao diện Đăng ký tài khoản
+        ├── home.jsp                           # Trang chủ hiển thị danh mục
+        ├── login.jsp                          # Trang đăng nhập
+        ├── register.jsp                       # Trang đăng ký
         └── admin
-            ├── category-list.jsp              # Giao diện Bảng danh sách danh mục (ảnh, sửa, xóa)
-            ├── category-add.jsp               # Giao diện Form thêm mới danh mục (upload file ảnh)
-            └── category-edit.jsp              # Giao diện Form chỉnh sửa danh mục
+            ├── category-list.jsp              # Bảng danh sách danh mục
+            ├── category-add.jsp               # Form thêm danh mục
+            └── category-edit.jsp              # Form chỉnh sửa danh mục
 ```
 
 ---
 
-## 4. MÔ HÌNH THỰC THỂ DỮ LIỆU (JPA ENTITIES & RELATIONSHIPS)
+## 4. Mô hình thực thể dữ liệu
 
 ### A. Thực thể `Category` ([Category.java](src/main/java/vn/iotstar/entity/Category.java))
 Ánh xạ tới bảng `categories` trong CSDL:
@@ -187,7 +187,7 @@ public class Category implements Serializable {
 ```
 
 ### B. Thực thể `Video` ([Video.java](src/main/java/vn/iotstar/entity/Video.java))
-Ánh xạ tới bảng `videos` trong CSDL, thể hiện mối quan hệ nhiều-1 với Category:
+Ánh xạ tới bảng `videos`, thể hiện quan hệ nhiều-1 với Category:
 ```java
 @Entity
 @Table(name = "videos")
@@ -220,28 +220,28 @@ public class Video implements Serializable {
 ```
 
 ### C. Thực thể `User` ([User.java](src/main/java/vn/iotstar/entity/User.java))
-Ánh xạ tới bảng `users` phục vụ xác thực và phân quyền người dùng:
-* `id` (`INT`, Khóa chính tự tăng).
-* `userName` (`VARCHAR(50)`, Duy nhất, không rỗng).
-* `passWord` (`VARCHAR(255)`, Mật khẩu tài khoản).
-* `fullName` (`NVARCHAR(100)`, Họ và tên).
-* `email` (`NVARCHAR(150)`, Địa chỉ hòm thư).
-* `phone` (`VARCHAR(20)`, Số điện thoại liên hệ).
-* `roleid` (`INT`, Phân cấp vai trò: `1` là Quản trị viên - Admin, `2` là Quản lý, `3` là Người dùng thường).
-* `createdDate` (`DATE`, Ngày tạo tài khoản).
+Ánh xạ tới bảng `users` phục vụ xác thực và phân quyền:
+* `id` (`INT`, khóa chính tự tăng).
+* `userName` (`VARCHAR(50)`, giá trị duy nhất, không rỗng).
+* `passWord` (`VARCHAR(255)`, mật khẩu lưu trữ).
+* `fullName` (`NVARCHAR(100)`, họ tên người dùng).
+* `email` (`NVARCHAR(150)`, địa chỉ email).
+* `phone` (`VARCHAR(20)`, số điện thoại liên hệ).
+* `roleid` (`INT`, phân quyền: `1` là Quản trị viên, `2` là Quản lý, `3` là Người dùng thường).
+* `createdDate` (`DATE`, thời điểm tạo tài khoản).
 
 ---
 
-## 5. CHI TIẾT TẦNG XỬ LÝ DỮ LIỆU (DAO & SERVICE LAYERS)
+## 5. Chi tiết tầng xử lý dữ liệu
 
-Tầng DAO được triển khai độc quyền bằng JPA `EntityManager`, loại bỏ hoàn toàn các câu lệnh JDBC SQL thủ công:
+Các thao tác dữ liệu được thực thi thông qua `EntityManager` và JPQL:
 
-| Phương thức trong ICategoryDao | Cú pháp triển khai bằng JPA / JPQL | Chức năng nghiệp vụ |
+| Phương thức trong ICategoryDao | Cách triển khai qua JPA / JPQL | Mô tả chức năng |
 | :--- | :--- | :--- |
-| `insert(Category category)` | `enma.persist(category)` trong `trans.begin()` / `commit()` | Thêm mới 1 danh mục vào cơ sở dữ liệu. |
-| `update(Category category)` | `enma.merge(category)` trong `trans.begin()` / `commit()` | Cập nhật thông tin danh mục. |
+| `insert(Category category)` | `enma.persist(category)` trong giao dịch `trans.begin()` và `commit()` | Thêm danh mục mới vào CSDL. |
+| `update(Category category)` | `enma.merge(category)` trong giao dịch `trans.begin()` và `commit()` | Cập nhật thông tin danh mục. |
 | `delete(int cateid)` | `enma.remove(enma.find(Category.class, cateid))` | Xóa danh mục theo ID. |
-| `findById(int cateid)` | `enma.find(Category.class, cateid)` | Tìm nhanh danh mục theo khóa chính. |
+| `findById(int cateid)` | `enma.find(Category.class, cateid)` | Truy vấn danh mục theo khóa chính. |
 | `findByCategoryname(String name)` | `SELECT c FROM Category c WHERE c.categoryname = :catename` | Tìm danh mục theo tên chính xác. |
 | `findAll()` | `enma.createNamedQuery("Category.findAll", Category.class)` | Lấy toàn bộ danh sách danh mục. |
 | `searchByName(String catname)` | `SELECT c FROM Category c WHERE c.categoryname LIKE :catname` | Tìm kiếm danh mục chứa từ khóa. |
@@ -250,40 +250,39 @@ Tầng DAO được triển khai độc quyền bằng JPA `EntityManager`, lo�
 
 ---
 
-## 6. HƯỚNG DẪN THIẾT LẬP CƠ SỞ DỮ LIỆU SQL SERVER
+## 6. Hướng dẫn thiết lập cơ sở dữ liệu SQL Server
 
-### Bước 6.1: Khởi tạo CSDL bằng file database.sql
-1. Mở phần mềm **SQL Server Management Studio (SSMS)** và kết nối với máy chủ SQL Server.
-2. Mở file **`database.sql`** có sẵn trong thư mục dự án `E:\WEb\JPA`.
-3. Nhấn phím **F5** (hoặc nút **Execute**) để thực thi toàn bộ script:
-   * Tự động tạo cơ sở dữ liệu `webst2`.
-   * Tự động tạo bảng `categories`, `videos`, `users`.
-   * Chèn sẵn dữ liệu danh mục mẫu và các tài khoản kiểm thử hệ thống.
+### Bước 6.1: Khởi tạo dữ liệu bằng database.sql
+1. Mở SQL Server Management Studio (SSMS) và kết nối vào máy chủ SQL Server.
+2. Mở file `database.sql` trong thư mục dự án `E:\WEb\JPA`.
+3. Bấm phím F5 (hoặc chọn Execute) để chạy script:
+   * Tạo cơ sở dữ liệu `webst2`.
+   * Tạo các bảng `categories`, `videos`, `users`.
+   * Chèn dữ liệu mẫu cho danh mục và tài khoản thử nghiệm.
 
-### Bước 6.2: Kích hoạt Giao thức TCP/IP và Cổng chuẩn 1433
-*(Bắt buộc đối với các phiên bản SQL Server Named Instance như `SERVER2022`, vì Windows mặc định tắt TCP/IP của các Named Instance khiến Java JDBC không thể kết nối qua cổng mạng)*.
+### Bước 6.2: Cấu hình giao thức TCP/IP và cổng 1433
+Áp dụng khi sử dụng SQL Server phiên bản Named Instance (như `SERVER2022`), do dịch vụ mạng mặc định có thể chưa bật TCP/IP:
 
-Bạn chọn **1 trong 2 cách** sau:
+Lựa chọn một trong hai cách:
 
-#### Cách 1: Tự động bằng Script Batch (Khuyên dùng - Nhanh nhất)
+#### Cách 1: Sử dụng script batch
 1. Mở thư mục dự án `E:\WEb\JPA`.
-2. Nhấp đúp chuột vào file **`enable-sql-tcp.bat`**.
-3. Khi bảng hỏi cấp quyền Quản trị viên (UAC) xuất hiện trên màn hình, bấm **Yes**.
-4. Script sẽ tự động cấu hình Registry để bật TCP/IP, gán cổng chuẩn `1433` cho tất cả IP (`IPAll`) và tự động khởi động lại dịch vụ SQL Server.
+2. Chạy file `enable-sql-tcp.bat` với quyền Administrator.
+3. Script cấu hình Registry để kích hoạt TCP/IP trên cổng `1433` cho mục `IPAll`, sau đó khởi động lại dịch vụ SQL Server.
 
-#### Cách 2: Kích hoạt bằng SQL Server Configuration Manager (Giao diện)
-1. Nhấn tổ hợp phím **`Win + R`**, nhập `SQLServerManager16.msc` và nhấn **Enter**.
-2. Tại cây thư mục bên trái, mở:
-   **SQL Server Network Configuration** &rarr; **Protocols for SERVER2022** (hoặc tên instance của bạn).
-3. Nhấp đúp vào dòng **TCP/IP** &rarr; tại thẻ *Protocol*, chuyển mục **Enabled** thành **`Yes`**.
-4. Chuyển sang thẻ **IP Addresses**, cuộn chuột xuống dưới cùng tại mục **IPAll**:
-   * **TCP Dynamic Ports:** Xóa trắng toàn bộ (để trống).
+#### Cách 2: Cấu hình thủ công qua SQL Server Configuration Manager
+1. Mở hộp thoại Run (`Win + R`), nhập `SQLServerManager16.msc` và nhấn Enter.
+2. Điều hướng theo cây thư mục bên trái:
+   **SQL Server Network Configuration** &rarr; **Protocols for SERVER2022** (hoặc instance tương ứng).
+3. Nhấp đúp vào **TCP/IP**, chuyển giá trị **Enabled** sang **Yes**.
+4. Chuyển sang tab **IP Addresses**, cuộn xuống mục **IPAll**:
+   * **TCP Dynamic Ports:** Để trống.
    * **TCP Port:** Nhập giá trị `1433`.
-5. Bấm **Apply** &rarr; **OK**.
-6. Chọn mục **SQL Server Services** ở cột bên trái &rarr; nhấp chuột phải vào `SQL Server (SERVER2022)` &rarr; chọn **Restart**.
+5. Chọn **Apply** rồi chọn **OK**.
+6. Chọn mục **SQL Server Services** ở danh mục bên trái, nhấp chuột phải vào dịch vụ `SQL Server (SERVER2022)` và chọn **Restart**.
 
-### Bước 6.3: Cấu hình chuẩn trong persistence.xml
-Tệp `src/main/resources/META-INF/persistence.xml` đã được cấu hình chuẩn sẵn sàng kết nối:
+### Bước 6.3: Cấu hình tệp persistence.xml
+Tệp `src/main/resources/META-INF/persistence.xml` thiết lập kết nối tới cơ sở dữ liệu:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
@@ -299,7 +298,7 @@ Tệp `src/main/resources/META-INF/persistence.xml` đã được cấu hình ch
         <class>vn.iotstar.entity.User</class>
         
         <properties>
-            <!-- Cấu hình JDBC Driver và kết nối Microsoft SQL Server cổng chuẩn 1433 -->
+            <!-- Cấu hình JDBC Driver và kết nối Microsoft SQL Server cổng 1433 -->
             <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
             <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://127.0.0.1:1433;encrypt=true;trustServerCertificate=true;loginTimeout=5;connectRetryCount=0;databaseName=webst2" />
             <property name="jakarta.persistence.jdbc.user" value="sa" />
@@ -322,13 +321,13 @@ Tệp `src/main/resources/META-INF/persistence.xml` đã được cấu hình ch
 
 ---
 
-## 7. KIỂM THỬ KẾT NỐI JPA ĐỘC LẬP BẰNG CONSOLE (TEST.JAVA)
+## 7. Kiểm thử kết nối JPA độc lập (Test.java)
 
-Đây là bước kiểm tra hoạt động độc lập của JPA theo đúng mục 5 trong tài liệu hướng dẫn:
-1. Mở dự án trong môi trường phát triển (IntelliJ IDEA, Eclipse hoặc VS Code).
-2. Điều hướng đến tệp: `src/main/java/vn/iotstar/config/Test.java`.
-3. Nhấp chuột phải vào tệp &rarr; chọn **Run 'Test.main()'** (hoặc bấm `Ctrl + Shift + F10`).
-4. **Kết quả mong đợi:** Cửa sổ Console sẽ hiển thị câu lệnh tạo bảng và chèn dữ liệu tự động của Hibernate:
+Quy trình kiểm tra hoạt động của JPA ngoài môi trường web:
+1. Mở dự án trong IDE (IntelliJ IDEA, Eclipse hoặc VS Code).
+2. Mở tệp `src/main/java/vn/iotstar/config/Test.java`.
+3. Chạy hàm `main()` (trong IntelliJ: chọn **Run 'Test.main()'** hoặc bấm `Ctrl + Shift + F10`).
+4. Kết quả ghi nhận tại Console: Hibernate thực thi lệnh tạo bảng và chèn bản ghi mẫu:
    ```text
    ==================================================
       BAT DAU KIEM TRA KET NOI VA THAO TAC VOI JPA   
@@ -343,96 +342,88 @@ Tệp `src/main/resources/META-INF/persistence.xml` đã được cấu hình ch
 
 ---
 
-## 8. HƯỚNG DẪN CHI TIẾT 3 CÁCH KHỞI ĐỘNG ỨNG DỤNG TRÊN TOMCAT
+## 8. Hướng dẫn khởi động ứng dụng trên Tomcat
 
-Dự án hỗ trợ 3 phương pháp chạy linh hoạt, đảm bảo máy tính của giảng viên hoặc sinh viên ở bất kỳ cấu hình nào cũng chạy thành công:
+Ứng dụng có thể triển khai theo ba cách:
 
-### 🌟 Cách A: Chạy tự động bằng Script Batch (Khuyên dùng khi chạy ngoài IDE)
-Dự án đã tích hợp sẵn 2 script thông minh, **tự động tương thích với mọi máy tính (kể cả máy không có ổ E)**:
-* **Cơ chế tự động dò tìm:** Script tự động quét tìm JDK (`%JAVA_HOME%`) và Apache Tomcat (`%CATALINA_HOME%`) trên các ổ đĩa `E:\`, `C:\`, `D:\`. Nếu máy khác cài Tomcat ở ổ C hay D, script vẫn tự động tìm thấy và copy file WAR chính xác.
+### Cách 1: Sử dụng script batch
 1. **Đóng gói file WAR:**
-   * Nhấp đúp chuột vào file **`build.bat`**.
-   * Script sẽ tự động gọi Maven biên dịch mã nguồn, đóng gói thành `target/JPA_Servlet_Category.war` và tự động sao chép sang thư mục `webapps` của Apache Tomcat.
-2. **Khởi động Apache Tomcat:**
-   * Nhấp đúp chuột vào file **`run-tomcat.bat`**.
-   * Cửa sổ Tomcat sẽ xuất hiện và load ứng dụng trong khoảng vài giây.
-3. **Mở trình duyệt:** Truy cập các đường dẫn được liệt kê tại **Mục 9** bên dưới.
+   * Chạy file `build.bat`.
+   * Script gọi Maven biên dịch mã nguồn, đóng gói thành `target/JPA_Servlet_Category.war` và sao chép vào thư mục `webapps` của Tomcat.
+2. **Khởi động Tomcat:**
+   * Chạy file `run-tomcat.bat`.
+   * Script tự động tìm đường dẫn `%CATALINA_HOME%` hoặc quét Tomcat trên các phân vùng đĩa khả dụng để khởi chạy.
+3. Truy cập ứng dụng qua các URL ở mục 9.
 
-### 🌟 Cách B: Chạy bằng Smart Tomcat trong IntelliJ IDEA (Khuyên dùng cho Giảng viên chấm bài)
-Đây là cách chuẩn mực và thuận tiện nhất khi mở dự án trực tiếp trong IDE IntelliJ:
-1. Mở thư mục dự án `JPA` bằng **IntelliJ IDEA**.
-2. Cài đặt plugin **Smart Tomcat** (nếu chưa có): Vào `File` &rarr; `Settings` &rarr; `Plugins` &rarr; Tìm kiếm `Smart Tomcat` &rarr; Bấm `Install`.
+### Cách 2: Chạy bằng plugin Smart Tomcat trong IntelliJ IDEA
+1. Mở thư mục dự án trong IntelliJ IDEA.
+2. Cài đặt plugin Smart Tomcat qua menu `File` &rarr; `Settings` &rarr; `Plugins`.
 3. Tạo cấu hình chạy:
-   * Vào menu **Run** &rarr; **Edit Configurations...** &rarr; Bấm nút **`+`** ở góc trên &rarr; Chọn **Smart Tomcat**.
-   * **Name:** Đặt tên tùy ý (Ví dụ: `Tomcat 11`).
-   * **Tomcat Server:** Chọn đường dẫn thư mục cài Apache Tomcat trên máy của bạn (Ví dụ: `C:\apache-tomcat-11.0.27` hoặc `E:\apache-tomcat-11.0.27`).
-   * **Deployment Directory:** Trỏ đến thư mục `src/main/webapp` của dự án.
-   * **Context Path:** Điền `/JPA_Servlet_Category` (đúng đường dẫn ngữ cảnh của dự án).
+   * Vào menu `Run` &rarr; `Edit Configurations...`, bấm nút dấu cộng và chọn **Smart Tomcat**.
+   * **Tomcat Server:** Chọn thư mục cài đặt Tomcat trên máy (ví dụ `C:\apache-tomcat-11.0.27`).
+   * **Deployment Directory:** Trỏ đến thư mục `src/main/webapp`.
+   * **Context Path:** Điền `/JPA_Servlet_Category`.
    * **Server Port:** `8080`.
-4. Bấm **Apply** &rarr; **OK**. Bấm nút **Run (Tam giác xanh)** hoặc phím `Shift + F10` để khởi động máy chủ.
+4. Bấm **Apply** &rarr; **OK**, sau đó bấm **Run** để khởi động máy chủ.
 
-### 🌟 Cách C: Triển khai thủ công bằng File WAR (Áp dụng cho mọi hệ điều hành Windows, macOS, Linux)
-1. Mở Terminal / CMD tại thư mục gốc của dự án và chạy lệnh Maven đóng gói:
+### Cách 3: Triển khai thủ công bằng file WAR
+1. Mở terminal tại thư mục gốc của dự án và chạy lệnh:
    ```bash
    mvn clean package -DskipTests
    ```
-2. Sau khi build thành công (`BUILD SUCCESS`), copy file:
-   `target/JPA_Servlet_Category.war`
-3. Dán (paste) file WAR trên vào thư mục **`webapps/`** bên trong thư mục cài đặt Apache Tomcat của bạn.
-4. Chạy file `bin/startup.bat` (trên Windows) hoặc `./bin/startup.sh` (trên Linux/macOS) để khởi động Tomcat.
+2. Sau khi bản dựng hoàn tất, sao chép file `target/JPA_Servlet_Category.war` vào thư mục `webapps/` của Apache Tomcat.
+3. Chạy lệnh `bin/startup.bat` (trên Windows) hoặc `./bin/startup.sh` (trên Linux/macOS) để bật máy chủ.
 
 ---
 
-## 9. BẢNG ĐIỀU HƯỚNG URL HỆ THỐNG & TÀI KHOẢN KIỂM THỬ
+## 9. Bảng điều hướng URL và tài khoản kiểm thử
 
-Sau khi Apache Tomcat đã khởi động xong, mở trình duyệt web (Chrome, Edge, Firefox) và sử dụng các đường link sau:
+Sau khi máy chủ khởi động, truy cập các địa chỉ tương ứng:
 
-### Bảng Điều Hướng Hệ Thống:
-| Chức năng | Đường dẫn (URL) | Phương thức | Quyền truy cập | Mô tả chức năng |
+### Bảng điều hướng hệ thống
+| Chức năng | Đường dẫn (URL) | Phương thức | Quyền truy cập | Ghi chú |
 | :--- | :--- | :---: | :--- | :--- |
-| **Quản lý Category (JPA CRUD)** | [http://localhost:8080/JPA_Servlet_Category/admin/categories](http://localhost:8080/JPA_Servlet_Category/admin/categories) | `GET` | Quản trị viên (Admin) | Hiển thị toàn bộ danh sách danh mục sản phẩm, có hình ảnh, nhãn trạng thái và nút Sửa/Xóa. |
-| **Thêm mới Category** | [http://localhost:8080/JPA_Servlet_Category/admin/category/add](http://localhost:8080/JPA_Servlet_Category/admin/category/add) | `GET`/`POST` | Quản trị viên (Admin) | Giao diện form thêm danh mục mới, hỗ trợ tải file ảnh từ máy tính hoặc dán link online. |
-| **Trang chủ Cửa hàng** | [http://localhost:8080/JPA_Servlet_Category/home](http://localhost:8080/JPA_Servlet_Category/home) | `GET` | Tất cả người dùng | Hiển thị các danh mục đang hoạt động dưới dạng thẻ sản phẩm đẹp mắt. Tự động ẩn menu quản trị đối với khách và user thường. |
-| **Trang Đăng nhập** | [http://localhost:8080/JPA_Servlet_Category/login](http://localhost:8080/JPA_Servlet_Category/login) | `GET`/`POST` | Tất cả người dùng | Xác thực tài khoản, hỗ trợ tính năng Ghi nhớ mật khẩu (*Remember Me*). |
-| **Trang Đăng ký** | [http://localhost:8080/JPA_Servlet_Category/register](http://localhost:8080/JPA_Servlet_Category/register) | `GET`/`POST` | Khách đăng ký mới | Đăng ký tài khoản thành viên mới với kiểm tra trùng email và username. |
-| **Đăng xuất** | [http://localhost:8080/JPA_Servlet_Category/logout](http://localhost:8080/JPA_Servlet_Category/logout) | `GET` | Thành viên đăng nhập | Hủy session làm việc và quay về trang đăng nhập. |
+| Quản lý Category | [http://localhost:8080/JPA_Servlet_Category/admin/categories](http://localhost:8080/JPA_Servlet_Category/admin/categories) | `GET` | Quản trị viên (Admin) | Danh sách danh mục, trạng thái và nút sửa/xóa. |
+| Thêm mới Category | [http://localhost:8080/JPA_Servlet_Category/admin/category/add](http://localhost:8080/JPA_Servlet_Category/admin/category/add) | `GET`/`POST` | Quản trị viên (Admin) | Form thêm danh mục, hỗ trợ tải file ảnh hoặc nhập link ngoài. |
+| Trang chủ | [http://localhost:8080/JPA_Servlet_Category/home](http://localhost:8080/JPA_Servlet_Category/home) | `GET` | Tất cả người dùng | Hiển thị các danh mục đang kích hoạt (status = 1). |
+| Trang Đăng nhập | [http://localhost:8080/JPA_Servlet_Category/login](http://localhost:8080/JPA_Servlet_Category/login) | `GET`/`POST` | Tất cả người dùng | Xác thực tài khoản và hỗ trợ lưu cookie đăng nhập. |
+| Trang Đăng ký | [http://localhost:8080/JPA_Servlet_Category/register](http://localhost:8080/JPA_Servlet_Category/register) | `GET`/`POST` | Khách vãng lai | Đăng ký tài khoản mới và kiểm tra trùng lặp email/username. |
+| Đăng xuất | [http://localhost:8080/JPA_Servlet_Category/logout](http://localhost:8080/JPA_Servlet_Category/logout) | `GET` | Người dùng đã đăng nhập | Hủy session và chuyển hướng về trang đăng nhập. |
 
-### 🔑 Tài khoản đăng nhập kiểm thử phân quyền:
-* **Tài khoản Quản trị viên (Admin):**
-  * **Tên đăng nhập:** `admin`
-  * **Mật khẩu:** `123` (hoặc `123456`)
-  * **Hành vi sau khi đăng nhập:** Hệ thống tự động chuyển hướng qua servlet `/waiting` và đưa vào khu vực Quản trị danh mục (`/admin/categories`).
-* **Tài khoản Người dùng thường (User):**
-  * **Tên đăng nhập:** `user`
-  * **Mật khẩu:** `123` (hoặc `123456`)
-  * **Hành vi sau khi đăng nhập:** Hệ thống chuyển về Trang chủ mua sắm (`/home`), ẩn hoàn toàn nút truy cập Quản trị.
-
----
-
-## ⚡ 10. CƠ CHẾ TẢI SIÊU TỐC & CHỐNG SẬP HỆ THỐNG (ZERO-DOWNTIME SAFE MODE)
-
-Trong các dự án sử dụng JPA & Hibernate truyền thống, nếu cơ sở dữ liệu tạm thời chưa bật hoặc bị chặn cổng mạng, mỗi yêu cầu HTTP sẽ bị treo từ 10 - 30 giây để chờ kết nối (`Connection timeout`), sau đó Tomcat sẽ sập với lỗi `HTTP Status 500 – Internal Server Error`.
-
-Dự án này đã giải quyết triệt để 2 vấn đề trên bằng 2 lớp bảo vệ cao cấp:
-1. **Chống nghẽn luồng trong [JpaConfig.java](src/main/java/vn/iotstar/config/JpaConfig.java):**
-   * Tích hợp bộ đệm kiểm tra thời gian thông minh (`RETRY_INTERVAL_MS = 15 giây`). Nếu cơ sở dữ liệu chưa sẵn sàng, hệ thống sẽ ngắt nghẽn ngay lập tức trong **0.001 giây** và trả quyền điều khiển về cho Servlet. **Tất cả các trang web tải tức thì (< 50ms), không hề có hiện tượng treo hay quay vòng chuột**.
-2. **Cơ chế dữ liệu dự phòng an toàn (Fallback Data) trong [CategoryDao.java](src/main/java/vn/iotstar/dao/impl/CategoryDao.java) & [UserDaoImpl.java](src/main/java/vn/iotstar/dao/impl/UserDaoImpl.java):**
-   * Nếu cơ sở dữ liệu đang trong quá trình khởi tạo, hệ thống tự động cung cấp dữ liệu mẫu an toàn, cho phép bạn đăng nhập ngay bằng tài khoản `admin / 123456` để kiểm tra phân quyền và giao diện mà không bao giờ gặp lỗi HTTP 500.
-   * Ngay sau khi bạn bật SQL Server thành công, `JpaConfig` sẽ tự động kết nối và chuyển đổi sang sử dụng trực tiếp 100% dữ liệu thật từ SQL Server mà không cần khởi động lại Web Server.
+### Tài khoản kiểm thử
+* **Quản trị viên (Admin):**
+  * Tên đăng nhập: `admin`
+  * Mật khẩu: `123` (hoặc `123456`)
+  * Điều hướng sau đăng nhập: Servlet `/waiting` chuyển hướng vào khu vực quản trị `/admin/categories`.
+* **Người dùng thường (User):**
+  * Tên đăng nhập: `user`
+  * Mật khẩu: `123` (hoặc `123456`)
+  * Điều hướng sau đăng nhập: Chuyển hướng về trang chủ `/home`.
 
 ---
 
-## ❓ 11. HƯỚNG DẪN XỬ LÝ SỰ CỐ THƯỜNG GẶP (TROUBLESHOOTING GUIDE)
+## 10. Cơ chế xử lý timeout và dữ liệu dự phòng
+
+Dự án xử lý tình huống mất kết nối cơ sở dữ liệu qua hai cơ chế:
+
+1. **Ngắt nghẽn kết nối trong [JpaConfig.java](src/main/java/vn/iotstar/config/JpaConfig.java):**
+   * Sử dụng biến đếm chu kỳ kiểm tra (`RETRY_INTERVAL_MS = 15000`). Nếu kết nối CSDL chưa hoàn tất, hệ thống không lặp lại yêu cầu kết nối liên tục trên từng request HTTP, tránh tình trạng treo luồng xử lý của servlet.
+2. **Dữ liệu dự phòng trong [CategoryDao.java](src/main/java/vn/iotstar/dao/impl/CategoryDao.java) và [UserDaoImpl.java](src/main/java/vn/iotstar/dao/impl/UserDaoImpl.java):**
+   * Khi dịch vụ SQL Server chưa khởi động xong, hệ thống nạp danh sách dự phòng trong bộ nhớ, cho phép kiểm tra giao diện và luồng điều hướng của tài khoản `admin`. Khi CSDL kết nối thành công, DAO tự động chuyển về đọc ghi trên CSDL thật.
+
+---
+
+## 11. Hướng dẫn xử lý sự cố thường gặp
 
 1. **Lỗi `Connection refused: getsockopt` hoặc không thể kết nối tới cổng 1433:**
-   * **Nguyên nhân:** Giao thức TCP/IP của SQL Server (đặc biệt là bản Named Instance như `SERVER2022`) bị tắt mặc định trong Windows Registry.
-   * **Cách xử lý:** Nhấp đúp chuột vào file **`enable-sql-tcp.bat`** (hoặc mở `SQLServerManager16.msc` chuyển `TCP/IP` sang `Enabled = Yes` và gán cổng `1433` cho `IPAll`).
-2. **Thêm danh mục mới nhưng không thấy hiển thị ở Trang chủ:**
-   * **Nguyên nhân:** Khi thêm danh mục, bạn đang chọn trạng thái là **`Khóa (status = 0)`**. Trang chủ chỉ hiển thị các sản phẩm có trạng thái hoạt động.
-   * **Cách xử lý:** Vào trang quản trị [http://localhost:8080/JPA_Servlet_Category/admin/categories](http://localhost:8080/JPA_Servlet_Category/admin/categories), bấm nút **Sửa** danh mục đó, chọn lại trạng thái **Hoạt động (status = 1)** &rarr; bấm **Cập Nhật**.
-3. **Hình ảnh upload tải lên không hiển thị:**
-   * **Giải thích:** Thư mục upload ảnh được tự động tạo và lưu trữ thông minh tại `E:\upload` hoặc `C:\upload`. Hình ảnh được phục vụ thông qua Servlet `DownloadImageController` với đường dẫn `/image?fname=...`. Bạn có thể tải file ảnh từ máy tính hoặc dán link ảnh online trực tiếp (ví dụ từ Unsplash) đều hiển thị sắc nét.
+   * *Nguyên nhân:* Giao thức TCP/IP của SQL Server chưa được bật hoặc chưa gán cổng 1433.
+   * *Cách xử lý:* Chạy file `enable-sql-tcp.bat` với quyền Administrator hoặc cấu hình lại cổng 1433 cho mục `IPAll` trong SQL Server Configuration Manager.
+2. **Danh mục mới tạo không hiển thị ở trang chủ:**
+   * *Nguyên nhân:* Thuộc tính trạng thái của danh mục đang để giá trị `0` (khóa). Trang chủ chỉ truy vấn các bản ghi có `status = 1`.
+   * *Cách xử lý:* Vào trang quản trị danh mục, chọn sửa bản ghi và cập nhật trạng thái sang `1`.
+3. **Ảnh tải lên không hiển thị:**
+   * *Nguyên nhân và cơ chế:* File ảnh được lưu tại thư mục upload cục bộ (`E:\upload` hoặc `C:\upload`) và phục vụ qua servlet `DownloadImageController` (`/image?fname=...`). Cần đảm bảo thư mục upload có quyền ghi và tên file trùng khớp với giá trị lưu trong CSDL.
 
 ---
 
-**Link repository nộp bài trên hệ thống LMS:** [https://github.com/TBL251/JPA.git](https://github.com/TBL251/JPA.git)
+Đường dẫn repository nộp bài: [https://github.com/TBL251/JPA.git](https://github.com/TBL251/JPA.git)
