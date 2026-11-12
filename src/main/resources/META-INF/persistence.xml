@@ -13,8 +13,9 @@
         
         <properties>
             <!-- Cấu hình kết nối CSDL Microsoft SQL Server (databaseName: webst2) -->
+            <!-- Dùng 127.0.0.1 để tránh timeout IPv6 của Windows -->
             <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://localhost:63755;encrypt=true;trustServerCertificate=true;databaseName=webst2" />
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://127.0.0.1:63755;encrypt=true;trustServerCertificate=true;loginTimeout=5;connectRetryCount=0;databaseName=webst2" />
             <property name="jakarta.persistence.jdbc.user" value="sa" />
             <property name="jakarta.persistence.jdbc.password" value="1234567@a$" />
             
