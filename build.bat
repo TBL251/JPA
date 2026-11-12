@@ -1,11 +1,10 @@
 @echo off
-chcp 65001 >nul
-echo ========================================================
-echo   BAT DAU DONG GOI PROJECT JPA 3.0 VOI MAVEN
-echo ========================================================
-
 set "JAVA_HOME=C:\Users\Admin\AppData\Local\Programs\IntelliJ IDEA\jbr"
 set "PATH=%JAVA_HOME%\bin;C:\Users\Admin\AppData\Local\Programs\IntelliJ IDEA\plugins\maven\lib\maven3\bin;%PATH%"
+
+echo ========================================================
+echo   BAT DAU BUILD VA DONG GOI DU AN JPA 3.0
+echo ========================================================
 
 cd /d "%~dp0"
 call "C:\Users\Admin\AppData\Local\Programs\IntelliJ IDEA\plugins\maven\lib\maven3\bin\mvn.cmd" clean package -DskipTests
@@ -28,4 +27,3 @@ if %ERRORLEVEL% EQU 0 (
     echo ========================================================
 )
 pause
-
