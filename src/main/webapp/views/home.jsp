@@ -32,10 +32,12 @@
         <div style="font-weight: 700; font-size: 18px;">HCMUTE SHOPPING (JPA 3.0)</div>
         <div>
             <a href="<c:url value="/home"/>">Trang chủ</a>
-            <a href="<c:url value="/admin/categories"/>">Quản lý Category</a>
+            <c:if test="${not empty sessionScope.account && (sessionScope.account.roleid == 1 || sessionScope.account.roleid == 2)}">
+                <a href="<c:url value="/admin/categories"/>" style="color: #38bdf8; font-weight: bold;">[Khu vực Quản trị Category]</a>
+            </c:if>
             <c:choose>
                 <c:when test="${not empty sessionScope.account}">
-                    <span style="margin-left: 20px; color: #38bdf8;">Xin chào, <b>${sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.userName}</b></span>
+                    <span style="margin-left: 20px; color: #cbd5e1;">Xin chào, <b>${sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.userName}</b></span>
                     <a href="<c:url value="/logout"/>">Đăng xuất</a>
                 </c:when>
                 <c:otherwise>
@@ -47,9 +49,16 @@
     </div>
 
     <div class="hero">
-        <h1>Hệ Thống Quản Lý Category với JPA 3.0 & Hibernate</h1>
+        <h1>Hệ Thống Mua Sắm & Quản Lý Category với JPA 3.0</h1>
         <p>Khoa Công nghệ Thông tin - Trường ĐH Sư phạm Kỹ thuật TP.HCM (HCMUTE)</p>
-        <a href="<c:url value="/admin/categories"/>" class="btn" style="padding: 12px 24px; font-size: 15px;">Truy cập trang Quản trị Category &rarr;</a>
+        <c:choose>
+            <c:when test="${not empty sessionScope.account && (sessionScope.account.roleid == 1 || sessionScope.account.roleid == 2)}">
+                <a href="<c:url value="/admin/categories"/>" class="btn" style="padding: 12px 24px; font-size: 15px;">Truy cập trang Quản trị Category (JPA) &rarr;</a>
+            </c:when>
+            <c:when test="${empty sessionScope.account}">
+                <a href="<c:url value="/login"/>" class="btn" style="padding: 12px 24px; font-size: 15px; background: #059669;">Đăng nhập tài khoản &rarr;</a>
+            </c:when>
+        </c:choose>
     </div>
 
     <div class="container">
