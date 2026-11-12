@@ -17,6 +17,14 @@ if %ERRORLEVEL% NEQ 0 (
     )
 )
 
+set "TARGET_WEBAPPS="
+if defined CATALINA_HOME (
+    if exist "%CATALINA_HOME%\webapps" set "TARGET_WEBAPPS=%CATALINA_HOME%\webapps"
+)
+if not defined TARGET_WEBAPPS if exist "E:\apache-tomcat-11.0.27\webapps" set "TARGET_WEBAPPS=E:\apache-tomcat-11.0.27\webapps"
+if not defined TARGET_WEBAPPS if exist "C:\apache-tomcat-11.0.27\webapps" set "TARGET_WEBAPPS=C:\apache-tomcat-11.0.27\webapps"
+if not defined TARGET_WEBAPPS if exist "D:\apache-tomcat-11.0.27\webapps" set "TARGET_WEBAPPS=D:\apache-tomcat-11.0.27\webapps"
+
 echo ========================================================
 echo   BAT DAU BUILD VA DONG GOI DU AN JPA 3.0
 echo ========================================================
@@ -30,14 +38,6 @@ if %ERRORLEVEL% EQU 0 (
     echo   BUILD THANH CONG!
     echo   File WAR duoc tao tai: target\JPA_Servlet_Category.war
     echo ========================================================
-
-    set "TARGET_WEBAPPS="
-    if defined CATALINA_HOME (
-        if exist "%CATALINA_HOME%\webapps" set "TARGET_WEBAPPS=%CATALINA_HOME%\webapps"
-    )
-    if not defined TARGET_WEBAPPS if exist "E:\apache-tomcat-11.0.27\webapps" set "TARGET_WEBAPPS=E:\apache-tomcat-11.0.27\webapps"
-    if not defined TARGET_WEBAPPS if exist "C:\apache-tomcat-11.0.27\webapps" set "TARGET_WEBAPPS=C:\apache-tomcat-11.0.27\webapps"
-    if not defined TARGET_WEBAPPS if exist "D:\apache-tomcat-11.0.27\webapps" set "TARGET_WEBAPPS=D:\apache-tomcat-11.0.27\webapps"
 
     if defined TARGET_WEBAPPS (
         copy /Y "target\JPA_Servlet_Category.war" "%TARGET_WEBAPPS%\"

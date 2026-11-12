@@ -1,5 +1,6 @@
 package vn.iotstar.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.EntityManager;
@@ -80,12 +81,16 @@ public class CategoryDao implements ICategoryDao {
 
     @Override
     public Category findById(int cateid) {
-        EntityManager enma = JpaConfig.getEntityManager();
         try {
-            Category category = enma.find(Category.class, cateid);
-            return category;
-        } finally {
-            enma.close();
+            EntityManager enma = JpaConfig.getEntityManager();
+            try {
+                return enma.find(Category.class, cateid);
+            } finally {
+                enma.close();
+            }
+        } catch (Exception e) {
+            System.err.println("[LỖI KẾT NỐI JPA] findById: " + e.getMessage());
+            return null;
         }
     }
 
@@ -108,52 +113,79 @@ public class CategoryDao implements ICategoryDao {
 
     @Override
     public List<Category> findAll() {
-        EntityManager enma = JpaConfig.getEntityManager();
         try {
-            TypedQuery<Category> query = enma.createNamedQuery("Category.findAll", Category.class);
-            return query.getResultList();
-        } finally {
-            enma.close();
+            EntityManager enma = JpaConfig.getEntityManager();
+            try {
+                TypedQuery<Category> query = enma.createNamedQuery("Category.findAll", Category.class);
+                return query.getResultList();
+            } finally {
+                enma.close();
+            }
+        } catch (Exception e) {
+            System.err.println("[LỖI KẾT NỐI JPA] findAll: " + e.getMessage());
+            return getFallbackCategories();
         }
     }
 
     @Override
     public List<Category> searchByName(String catname) {
-        EntityManager enma = JpaConfig.getEntityManager();
-        String jpql = "SELECT c FROM Category c WHERE c.categoryname LIKE :catname";
         try {
-            TypedQuery<Category> query = enma.createQuery(jpql, Category.class);
-            query.setParameter("catname", "%" + catname + "%");
-            return query.getResultList();
-        } finally {
-            enma.close();
+            EntityManager enma = JpaConfig.getEntityManager();
+            String jpql = "SELECT c FROM Category c WHERE c.categoryname LIKE :catname";
+            try {
+                TypedQuery<Category> query = enma.createQuery(jpql, Category.class);
+                query.setParameter("catname", "%" + catname + "%");
+                return query.getResultList();
+            } finally {
+                enma.close();
+            }
+        } catch (Exception e) {
+            System.err.println("[LỖI KẾT NỐI JPA] searchByName: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 
     @Override
     public List<Category> findAll(int page, int pagesize) {
-        EntityManager enma = JpaConfig.getEntityManager();
         try {
-            TypedQuery<Category> query = enma.createNamedQuery("Category.findAll", Category.class);
-            query.setFirstResult(page * pagesize);
-            query.setMaxResults(pagesize);
-            return query.getResultList();
-        } finally {
-            enma.close();
+            EntityManager enma = JpaConfig.getEntityManager();
+            try {
+                TypedQuery<Category> query = enma.createNamedQuery("Category.findAll", Category.class);
+                query.setFirstResult(page * pagesize);
+                query.setMaxResults(pagesize);
+                return query.getResultList();
+            } finally {
+                enma.close();
+            }
+        } catch (Exception e) {
+            System.err.println("[LỖI KẾT NỐI JPA] findAll(page, pagesize): " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 
     @Override
     public int count() {
-        EntityManager enma = JpaConfig.getEntityManager();
-        String jpql = "SELECT count(c) FROM Category c";
         try {
-            Query query = enma.createQuery(jpql);
-            Object result = query.getSingleResult();
-            return ((Number) result).intValue();
-        } finally {
-            enma.close();
+            EntityManager enma = JpaConfig.getEntityManager();
+            String jpql = "SELECT count(c) FROM Category c";
+            try {
+                Query query = enma.createQuery(jpql);
+                Object result = query.getSingleResult();
+                return ((Number) result).intValue();
+            } finally {
+                enma.close();
+            }
+        } catch (Exception e) {
+            System.err.println("[LỖI KẾT NỐI JPA] count: " + e.getMessage());
+            return 0;
         }
     }
-}
 
+    private List<Category> getFallbackCategories() {
+        List<Category> list = new ArrayList<>();
+        list.add(new Category(1, "Điện thoại thông minh (Dữ liệu tạm)", "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300", 1));
+        list.add(new Category(2, "Laptop & Máy tính xách tay (Dữ liệu tạm)", "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300", 1));
+        list.add(new Category(3, "Phụ kiện công nghệ (Dữ liệu tạm)", "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300", 1));
+        return list;
+    }
+}
