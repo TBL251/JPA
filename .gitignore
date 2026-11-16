@@ -35,3 +35,6 @@ build/
 *.log
 *.tmp
 
+### Mail credentials (Bảo mật tài khoản Email/App Password) ###
+src/main/resources/mail.properties
+

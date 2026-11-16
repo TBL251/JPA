@@ -1,0 +1,13 @@
+# File cấu hình mẫu - Không điền mật khẩu thật vào file này khi push lên GitHub!
+# Để chạy thật: Tạo file mail.properties cùng thư mục và điền thông tin tài khoản của bạn.
+
+mail.smtp.host=smtp.gmail.com
+mail.smtp.port=587
+mail.smtp.auth=true
+mail.smtp.starttls.enable=true
+
+# Điền email Gmail của bạn:
+mail.sender.email=your_email@gmail.com
+
+# Điền Mật khẩu ứng dụng 16 ký tự (App Password):
+mail.sender.password=your_app_password

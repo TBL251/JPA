@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
+import vn.iotstar.util.EmailUtil;
 
 @WebServlet(urlPatterns = { "/register" })
 public class RegisterController extends HttpServlet {
@@ -33,36 +34,43 @@ public class RegisterController extends HttpServlet {
         String fullname = req.getParameter("fullname");
         String phone = req.getParameter("phone");
 
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            req.setAttribute("alert", "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!");
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()
+                || email == null || email.trim().isEmpty()) {
+            req.setAttribute("alert", "Vui lòng nhập đầy đủ tên đăng nhập, mật khẩu và email nhận mã OTP!");
             req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
             return;
         }
 
         try {
             if (userService.checkExistUsername(username.trim())) {
-                req.setAttribute("alert", "Tên đăng nhập đã tồn tại!");
+                req.setAttribute("alert", "Tên đăng nhập đã tồn tại! Vui lòng chọn tên khác.");
                 req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
                 return;
             }
 
-            if (email != null && !email.trim().isEmpty() && userService.checkExistEmail(email.trim())) {
-                req.setAttribute("alert", "Email đã tồn tại!");
+            if (userService.checkExistEmail(email.trim())) {
+                req.setAttribute("alert", "Email này đã được đăng ký trong hệ thống!");
                 req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
                 return;
             }
 
-            boolean success = userService.register(username.trim(), password.trim(), email, fullname, phone);
+            // Sinh mã OTP 6 chữ số
+            String otpCode = EmailUtil.generateOtp();
+
+            // Đăng ký tài khoản với trạng thái status = 0 (chờ kích hoạt OTP)
+            boolean success = userService.register(username.trim(), password.trim(), email.trim(), fullname, phone, otpCode);
+
             if (success) {
-                req.setAttribute("message", "Đăng ký thành công! Vui lòng đăng nhập.");
-                req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+                // Chuyển hướng sang trang xác nhận mã OTP
+                req.getSession().setAttribute("verifyEmail", email.trim());
+                resp.sendRedirect(req.getContextPath() + "/verify-otp?email=" + email.trim() + "&msg=sent");
             } else {
-                req.setAttribute("alert", "Đăng ký thất bại hoặc CSDL chưa sẵn sàng!");
+                req.setAttribute("alert", "Đăng ký thất bại! Vui lòng thử lại sau.");
                 req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
             }
         } catch (Exception e) {
             System.err.println("[REGISTER ERROR] " + e.getMessage());
-            req.setAttribute("alert", "Lỗi xử lý đăng ký hoặc chưa kết nối CSDL: " + e.getMessage());
+            req.setAttribute("alert", "Lỗi xử lý đăng ký hoặc kết nối CSDL: " + e.getMessage());
             req.getRequestDispatcher("/views/register.jsp").forward(req, resp);
         }
     }

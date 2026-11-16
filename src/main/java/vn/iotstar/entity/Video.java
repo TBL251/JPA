@@ -22,7 +22,7 @@ public class Video implements Serializable {
     private String videoId;
 
     @Column(name = "active")
-    private boolean active;
+    private boolean active = true;
 
     @Column(name = "description", columnDefinition = "NVARCHAR(MAX) NULL")
     private String description;
@@ -34,12 +34,17 @@ public class Video implements Serializable {
     private String title;
 
     @Column(name = "views")
-    private int views;
+    private int views = 0;
 
     // Bi-directional many-to-one association to Category
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private Category category;
+
+    // Many-to-one association to User (Moi video thuoc ve mot user dang)
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
     public Video() {
     }
@@ -53,6 +58,18 @@ public class Video implements Serializable {
         this.title = title;
         this.views = views;
         this.category = category;
+    }
+
+    public Video(String videoId, boolean active, String description, String poster, String title, int views,
+            Category category, User user) {
+        this.videoId = videoId;
+        this.active = active;
+        this.description = description;
+        this.poster = poster;
+        this.title = title;
+        this.views = views;
+        this.category = category;
+        this.user = user;
     }
 
     public String getVideoId() {
@@ -111,7 +128,6 @@ public class Video implements Serializable {
         this.category = category;
     }
 
-    // Alias tuong thich
     public Category getCategories() {
         return this.category;
     }
@@ -120,9 +136,16 @@ public class Video implements Serializable {
         this.category = categories;
     }
 
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Video [videoId=" + videoId + ", title=" + title + ", active=" + active + ", views=" + views + "]";
     }
 }
-

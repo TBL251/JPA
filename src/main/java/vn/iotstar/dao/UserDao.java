@@ -5,6 +5,8 @@ import vn.iotstar.entity.User;
 
 public interface UserDao {
     User get(String username);
+    User findById(int id);
+    User findByEmail(String email);
     void insert(User user);
     void update(User user);
     boolean checkExistEmail(String email);
@@ -12,4 +14,3 @@ public interface UserDao {
     boolean checkExistPhone(String phone);
     List<User> findAll();
 }
-

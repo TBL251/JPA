@@ -2,13 +2,17 @@ package vn.iotstar.entity;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -44,8 +48,18 @@ public class User implements Serializable {
     @Column(name = "phone", columnDefinition = "VARCHAR(20) NULL")
     private String phone;
 
+    @Column(name = "status")
+    private int status = 1; // 0: Cho kich hoat OTP, 1: Da kich hoat
+
+    @Column(name = "code", columnDefinition = "VARCHAR(10) NULL")
+    private String code; // Ma OTP xac thuc (6 chu so)
+
     @Column(name = "createddate")
     private Date createdDate;
+
+    // Quan he 1-n voi Video (Mot user so huu nhieu video)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Video> videos;
 
     public User() {
     }
@@ -60,6 +74,7 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createdDate = createdDate;
+        this.status = 1;
     }
 
     public User(int id, String email, String userName, String fullName, String passWord, String avatar, int roleid,
@@ -73,6 +88,7 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createdDate = createdDate;
+        this.status = 1;
     }
 
     public int getId() {
@@ -139,6 +155,22 @@ public class User implements Serializable {
         this.phone = phone;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
     public Date getCreatedDate() {
         return createdDate;
     }
@@ -147,10 +179,17 @@ public class User implements Serializable {
         this.createdDate = createdDate;
     }
 
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
     @Override
     public String toString() {
         return "User [id=" + id + ", email=" + email + ", userName=" + userName + ", fullName=" + fullName
-                + ", roleid=" + roleid + "]";
+                + ", roleid=" + roleid + ", status=" + status + "]";
     }
 }
-

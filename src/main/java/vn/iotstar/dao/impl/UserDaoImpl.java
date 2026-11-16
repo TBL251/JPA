@@ -38,6 +38,49 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public User findById(int id) {
+        EntityManager enma = JpaConfig.getEntityManager();
+        if (enma == null) {
+            return null;
+        }
+        try {
+            return enma.find(User.class, id);
+        } catch (Exception e) {
+            System.err.println("[LỖI KẾT NỐI JPA] UserDaoImpl.findById: " + e.getMessage());
+            return null;
+        } finally {
+            if (enma != null && enma.isOpen()) {
+                enma.close();
+            }
+        }
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        EntityManager enma = JpaConfig.getEntityManager();
+        if (enma == null) {
+            return null;
+        }
+        try {
+            String jpql = "SELECT u FROM User u WHERE u.email = :email";
+            TypedQuery<User> query = enma.createQuery(jpql, User.class);
+            query.setParameter("email", email);
+            List<User> list = query.getResultList();
+            if (list != null && !list.isEmpty()) {
+                return list.get(0);
+            }
+            return null;
+        } catch (Exception e) {
+            System.err.println("[LỖI KẾT NỐI JPA] UserDaoImpl.findByEmail: " + e.getMessage());
+            return null;
+        } finally {
+            if (enma != null && enma.isOpen()) {
+                enma.close();
+            }
+        }
+    }
+
+    @Override
     public void insert(User user) {
         EntityManager enma = JpaConfig.getEntityManager();
         if (enma == null) {
@@ -98,7 +141,6 @@ public class UserDaoImpl implements UserDao {
             Long count = enma.createQuery(jpql, Long.class).setParameter("email", email).getSingleResult();
             return count > 0;
         } catch (Exception e) {
-            System.err.println("[LỖI KẾT NỐI JPA] checkExistEmail: " + e.getMessage());
             return false;
         } finally {
             if (enma != null && enma.isOpen()) {
@@ -111,15 +153,14 @@ public class UserDaoImpl implements UserDao {
     public boolean checkExistUsername(String username) {
         EntityManager enma = JpaConfig.getEntityManager();
         if (enma == null) {
-            return "admin".equalsIgnoreCase(username) || "user".equalsIgnoreCase(username);
+            return false;
         }
         try {
             String jpql = "SELECT count(u) FROM User u WHERE u.userName = :username";
             Long count = enma.createQuery(jpql, Long.class).setParameter("username", username).getSingleResult();
             return count > 0;
         } catch (Exception e) {
-            System.err.println("[LỖI KẾT NỐI JPA] checkExistUsername: " + e.getMessage());
-            return "admin".equalsIgnoreCase(username) || "user".equalsIgnoreCase(username);
+            return false;
         } finally {
             if (enma != null && enma.isOpen()) {
                 enma.close();
@@ -138,7 +179,6 @@ public class UserDaoImpl implements UserDao {
             Long count = enma.createQuery(jpql, Long.class).setParameter("phone", phone).getSingleResult();
             return count > 0;
         } catch (Exception e) {
-            System.err.println("[LỖI KẾT NỐI JPA] checkExistPhone: " + e.getMessage());
             return false;
         } finally {
             if (enma != null && enma.isOpen()) {
@@ -151,19 +191,12 @@ public class UserDaoImpl implements UserDao {
     public List<User> findAll() {
         EntityManager enma = JpaConfig.getEntityManager();
         if (enma == null) {
-            List<User> list = new ArrayList<>();
-            list.add(getFallbackUser("admin"));
-            list.add(getFallbackUser("user"));
-            return list;
+            return getFallbackList();
         }
         try {
             return enma.createNamedQuery("User.findAll", User.class).getResultList();
         } catch (Exception e) {
-            System.err.println("[LỖI KẾT NỐI JPA] findAll users: " + e.getMessage());
-            List<User> list = new ArrayList<>();
-            list.add(getFallbackUser("admin"));
-            list.add(getFallbackUser("user"));
-            return list;
+            return getFallbackList();
         } finally {
             if (enma != null && enma.isOpen()) {
                 enma.close();
@@ -171,32 +204,25 @@ public class UserDaoImpl implements UserDao {
         }
     }
 
-    /**
-     * Cung cấp người dùng dự phòng khi CSDL đang ngoại tuyến hoặc đang kích hoạt kết nối.
-     * Hỗ trợ tài khoản admin (roleid=1) và user (roleid=2).
-     */
     private User getFallbackUser(String username) {
         if ("admin".equalsIgnoreCase(username)) {
-            User admin = new User();
-            admin.setId(1);
-            admin.setUserName("admin");
-            admin.setPassWord("123456");
-            admin.setFullName("Quản trị viên Hệ thống (Dữ liệu tạm)");
-            admin.setEmail("admin@iotstar.vn");
-            admin.setPhone("0987654321");
-            admin.setRoleid(1);
-            return admin;
+            User u = new User("admin@ute.udn.vn", "admin", "Quản trị viên (Dev)", "123", null, 1, "0901234567", null);
+            u.setId(1);
+            u.setStatus(1);
+            return u;
         } else if ("user".equalsIgnoreCase(username)) {
-            User user = new User();
-            user.setId(2);
-            user.setUserName("user");
-            user.setPassWord("123456");
-            user.setFullName("Người dùng Mẫu (Dữ liệu tạm)");
-            user.setEmail("user@iotstar.vn");
-            user.setPhone("0123456789");
-            user.setRoleid(2);
-            return user;
+            User u = new User("user@ute.udn.vn", "user", "Người dùng (Dev)", "123", null, 3, "0903456789", null);
+            u.setId(2);
+            u.setStatus(1);
+            return u;
         }
         return null;
+    }
+
+    private List<User> getFallbackList() {
+        List<User> list = new ArrayList<>();
+        list.add(getFallbackUser("admin"));
+        list.add(getFallbackUser("user"));
+        return list;
     }
 }
