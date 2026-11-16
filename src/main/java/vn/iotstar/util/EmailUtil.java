@@ -11,7 +11,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
-import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
@@ -156,10 +155,6 @@ public class EmailUtil {
             Transport.send(message);
             System.out.println("[EMAIL SERVICE THÀNH CÔNG] >>> Đã gửi email thật qua mạng Internet tới: " + toEmail + " <<<");
             success = true;
-        } catch (AddressException e) {
-            System.err.println("[EMAIL SERVICE LỖI ĐỊA CHỈ] " + e.getMessage());
-            e.printStackTrace();
-            success = false;
         } catch (MessagingException e) {
             System.err.println("[EMAIL SERVICE LỖI GỬI THẬT] " + e.getMessage());
             e.printStackTrace();
