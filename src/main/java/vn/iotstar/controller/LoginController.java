@@ -35,7 +35,7 @@ public class LoginController extends HttpServlet {
                     if (Constant.COOKIE_REMEMBER.equals(cookie.getName())) {
                         String username = cookie.getValue();
                         User user = userService.get(username);
-                        if (user != null) {
+                        if (user != null && user.getStatus() == 1) {
                             session = req.getSession(true);
                             session.setAttribute("account", user);
                             session.setAttribute("username", username);
@@ -73,6 +73,16 @@ public class LoginController extends HttpServlet {
             User user = userService.login(username.trim(), password.trim());
 
             if (user != null) {
+                // Kiểm tra tài khoản đã kích hoạt qua OTP hay chưa
+                if (user.getStatus() == 0) {
+                    req.setAttribute("alert", "Tài khoản chưa được kích hoạt qua mã OTP! "
+                            + "<a href=\"" + req.getContextPath() + "/verify-otp?email="
+                            + (user.getEmail() != null ? user.getEmail() : "")
+                            + "\" style=\"color: #2563eb; font-weight: bold; text-decoration: underline;\">Bấm vào đây để nhập mã OTP kích hoạt</a>");
+                    req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+                    return;
+                }
+
                 HttpSession session = req.getSession(true);
                 session.setAttribute("account", user);
                 session.setAttribute("username", user.getUserName());
@@ -83,7 +93,8 @@ public class LoginController extends HttpServlet {
 
                 resp.sendRedirect(req.getContextPath() + "/waiting");
             } else {
-                req.setAttribute("alert", "Tài khoản hoặc mật khẩu không đúng! (Dùng admin/123456 hoặc user/123456 khi CSDL đang khởi tạo)");
+                req.setAttribute("alert",
+                        "Tên đăng nhập hoặc mật khẩu không chính xác! (Mặc định: admin/123 hoặc user/123)");
                 req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
             }
         } catch (Exception e) {
