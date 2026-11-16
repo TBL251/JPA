@@ -31,7 +31,9 @@
 <body>
     <div class="nav-links">
         <a href="<c:url value="/home"/>">Trang chủ</a> | 
+        <a href="<c:url value="/video"/>">Xem Videos (/video)</a> | 
         <a href="<c:url value="/admin/categories"/>"><b>Quản lý Danh mục (JPA)</b></a> | 
+        <a href="<c:url value="/admin/videos"/>">Quản lý Videos</a> | 
         <a href="<c:url value="/logout"/>">Đăng xuất</a>
     </div>
 
