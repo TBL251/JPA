@@ -8,6 +8,7 @@
     <display-name>HCM-UTE Web Programming - CRUD Category JPA Hibernate</display-name>
 
     <welcome-file-list>
+        <welcome-file>home</welcome-file>
         <welcome-file>admin/categories</welcome-file>
         <welcome-file>login</welcome-file>
     </welcome-file-list>

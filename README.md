@@ -1,9 +1,11 @@
-# Báo cáo bài tập: Chuyển đổi Bài tập 01 sang JPA 3.0 và Jakarta EE 10
-## Hệ thống quản lý danh mục sản phẩm (CRUD Category) và phân quyền người dùng
+# Báo cáo bài tập: Mở rộng JPA 3.0, Xác thực OTP, Quản lý Video và Phân quyền
+
+Hệ thống quản lý danh mục sản phẩm, video đa phương tiện với xác thực OTP qua Email, băm mật khẩu bảo mật BCrypt và kiến trúc JPA 3.0 / Jakarta EE 10.
 
 ---
 
-### Thông tin chung
+## Thông tin chung
+
 * Trường: Đại học Sư phạm Kỹ thuật TP.HCM (HCMUTE)
 * Khoa: Công nghệ Thông tin
 * Bộ môn: Kỹ thuật Phần mềm / Công nghệ Web
@@ -15,415 +17,339 @@
 ---
 
 ## Mục lục
-1. [Giới thiệu và mục tiêu đề bài](#1-giới-thiệu-và-mục-tiêu-đề-bài)
-2. [Công nghệ sử dụng](#2-công-nghệ-sử-dụng)
-3. [Kiến trúc hệ thống và cấu trúc mã nguồn](#3-kiến-trúc-hệ-thống-và-cấu-trúc-mã-nguồn)
-4. [Mô hình thực thể dữ liệu](#4-mô-hình-thực-thể-dữ-liệu)
-5. [Chi tiết tầng xử lý dữ liệu](#5-chi-tiết-tầng-xử-lý-dữ-liệu)
-6. [Hướng dẫn thiết lập cơ sở dữ liệu SQL Server](#6-hướng-dẫn-thiết-lập-cơ-sở-dữ-liệu-sql-server)
-7. [Kiểm thử kết nối JPA độc lập (Test.java)](#7-kiểm-thử-kết-nối-jpa-độc-lập-testjava)
-8. [Hướng dẫn khởi động ứng dụng trên Tomcat](#8-hướng-dẫn-khởi-động-ứng-dụng-trên-tomcat)
-9. [Bảng điều hướng URL và tài khoản kiểm thử](#9-bảng-điều-hướng-url-và-tài-khoản-kiểm-thử)
-10. [Cơ chế xử lý timeout và dữ liệu dự phòng](#10-cơ-chế-xử-lý-timeout-và-dữ-liệu-dự-phòng)
-11. [Hướng dẫn xử lý sự cố thường gặp](#11-hướng-dẫn-xử-lý-sự-cố-thường-gặp)
+
+1. [Nội dung và yêu cầu bài tập](#1-nội-dung-và-yêu-cầu-bài-tập)
+2. [Công nghệ và thư viện sử dụng](#2-công-nghệ-và-thư-viện-sử-dụng)
+3. [Cấu trúc mã nguồn dự án](#3-cấu-trúc-mã-nguồn-dự-án)
+4. [Mô hình dữ liệu và quan hệ thực thể](#4-mô-hình-dữ-liệu-và-quan-hệ-thực-thể)
+5. [Chi tiết tính năng xác thực OTP và bảo mật](#5-chi-tiết-tính-năng-xác-thực-otp-và-bảo-mật)
+6. [Chi tiết tính năng quản lý Video và phát video](#6-chi-tiết-tính-năng-quản-lý-video-và-phát-video)
+7. [Hướng dẫn xử lý upload file bằng Multipart](#7-hướng-dẫn-xử-lý-upload-file-bằng-multipart)
+8. [Hướng dẫn thiết lập cơ sở dữ liệu SQL Server](#8-hướng-dẫn-thiết-lập-cơ-sở-dữ-liệu-sql-server)
+9. [Hướng dẫn biên dịch và triển khai ứng dụng](#9-hướng-dẫn-biên-dịch-và-triển-khai-ứng-dụng)
+10. [Bảng điều hướng URL và tài khoản kiểm thử](#10-bảng-điều-hướng-url-và-tài-khoản-kiểm-thử)
 
 ---
 
-## 1. Giới thiệu và mục tiêu đề bài
+## 1. Nội dung và yêu cầu bài tập
 
-Dự án chuyển đổi ứng dụng web từ JDBC thuần (Bài tập 01) sang JPA 3.0 (Jakarta Persistence), sử dụng Hibernate ORM 6.x trên nền tảng Jakarta EE 10.
+Dự án hoàn thiện các yêu cầu mở rộng trên nền tảng JPA 3.0 và Jakarta EE 10:
 
-Các nội dung được triển khai theo hai tài liệu hướng dẫn:
+1. **Kích hoạt tài khoản bằng mã OTP gửi qua Email**
+   * Khi đăng ký tài khoản (`/register`), người dùng điền thông tin và địa chỉ email nhận mã.
+   * Tài khoản được tạo ở trạng thái chưa kích hoạt (`status = 0`), mã OTP 6 chữ số được tạo ngẫu nhiên và lưu vào cơ sở dữ liệu (`users.code`).
+   * Hệ thống gửi email chứa mã OTP đến hòm thư người dùng qua Jakarta Mail (Gmail SMTP).
+   * Chuyển hướng người dùng sang trang `/verify-otp`. Khi nhập chính xác mã OTP, tài khoản chuyển sang trạng thái kích hoạt (`status = 1`), cho phép đăng nhập.
 
-### A. Yêu cầu tài liệu "Cấu hình và test JPA":
-* Khai báo dependency trong `pom.xml`: Hibernate ORM Core 6.x, Jakarta Persistence API 3.x, Microsoft SQL Server JDBC Driver.
-* Cấu hình tệp `META-INF/persistence.xml` chuẩn JPA 3.0 kết nối cơ sở dữ liệu `webst2` trên SQL Server.
-* Định nghĩa Entity `Category` và `Video` với các chú thích JPA: `@Entity`, `@Table`, `@Id`, `@GeneratedValue`, `@Column`, `@NamedQuery`.
-* Thiết lập quan hệ 1-Nhiều (một Category có nhiều Video) với `@OneToMany(mappedBy = "category")` và `@ManyToOne` kèm `@JoinColumn(name = "categoryId")`.
-* Xây dựng lớp `JpaConfig.java` quản lý `EntityManagerFactory` theo mô hình Singleton.
-* Xây dựng chương trình `Test.java` có hàm `main()` để kiểm thử độc lập: mở Transaction, cập nhật cấu trúc bảng (`hbm2ddl.auto=update`), chèn bản ghi mẫu cho Category và Video rồi xác nhận giao dịch.
+2. **Đăng nhập với mật khẩu được mã hóa (Hash Password) và Đăng xuất**
+   * Sử dụng thuật toán BCrypt với chuỗi muối ngẫu nhiên (`jBCrypt`) để băm mật khẩu khi lưu trữ.
+   * Xác thực đăng nhập qua hàm kiểm tra băm bảo mật, hỗ trợ tương thích tài khoản cũ.
+   * Ngăn chặn đăng nhập nếu tài khoản chưa kích hoạt OTP (`status = 0`), hướng dẫn người dùng tới trang xác thực.
+   * Chức năng đăng xuất (`/logout`) hủy phiên làm việc và xóa cookie ghi nhớ.
 
-### B. Yêu cầu tài liệu "Hướng dẫn CRUD với JPA3.0 và Jakarta 6.0":
-* Tầng DAO (`ICategoryDao` và `CategoryDao`): Thao tác qua `EntityManager` và truy vấn JPQL, cung cấp 9 phương thức CRUD:
-  1. `insert(Category category)`: Thêm danh mục mới vào CSDL.
-  2. `update(Category category)`: Cập nhật thông tin danh mục.
-  3. `delete(int cateid)`: Xóa danh mục theo mã ID.
-  4. `findById(int cateid)`: Truy vấn danh mục theo khóa chính.
-  5. `findByCategoryname(String name)`: Tìm danh mục theo tên chính xác.
-  6. `findAll()`: Lấy danh sách toàn bộ danh mục qua `@NamedQuery("Category.findAll")`.
-  7. `searchByName(String catname)`: Tìm danh mục theo từ khóa (`LIKE %...%`).
-  8. `findAll(int page, int pagesize)`: Phân trang danh mục kết hợp `setFirstResult()` và `setMaxResults()`.
-  9. `count()`: Đếm tổng số danh mục (`SELECT count(c) FROM Category c`).
-* Tầng Service (`ICategoryService` và `CategoryServiceImpl`): Đóng gói logic nghiệp vụ danh mục.
-* Tầng Controller (`CategoryController`): Servlet điều hướng các endpoint:
-  * `/admin/categories` và `/admin/category/list`: Hiển thị danh sách danh mục.
-  * `/admin/category/add` và `/admin/category/insert`: Form và xử lý thêm danh mục, hỗ trợ tải file ảnh qua `@MultipartConfig`.
-  * `/admin/category/edit` và `/admin/category/update`: Form và xử lý cập nhật danh mục.
-  * `/admin/category/delete`: Xóa danh mục.
-* Giao diện (JSP): Các trang quản trị `category-list.jsp`, `category-add.jsp`, `category-edit.jsp`.
+3. **Quên mật khẩu gửi mã xác nhận OTP qua Email**
+   * Endpoint `/forgot-password` tiếp nhận địa chỉ email đã đăng ký.
+   * Tạo mã OTP mới, cập nhật vào bảng `users` và gửi email xác nhận.
+   * Người dùng nhập mã OTP và mật khẩu mới tại `/reset-password`. Khi xác thực hợp lệ, mật khẩu mới được băm và cập nhật vào cơ sở dữ liệu.
 
-### C. Chuyển đổi các chức năng từ Bài tập 01 sang JPA 3.0:
-* Quản lý người dùng: Chuyển đổi bảng `users` sang Entity `User.java`, xây dựng DAO `UserDaoImpl.java` và Service `UserServiceImpl.java` thao tác qua `EntityManager`.
-* Đăng nhập và đăng ký: Xác thực tài khoản, đăng ký thành viên mới, mã hóa mật khẩu, ghi nhớ phiên đăng nhập bằng Cookie.
-* Phân quyền người dùng:
-  * Quản trị viên (`roleid = 1`): Chuyển hướng qua servlet `/waiting` vào trang quản trị danh mục (`/admin/categories`).
-  * Người dùng thường (`roleid = 2` hoặc `3`): Chuyển hướng về trang chủ (`/home`), không hiển thị liên kết quản trị.
-* Phục vụ hình ảnh (`DownloadImageController`): Servlet trả về ảnh qua endpoint `/image?fname=...`, hỗ trợ ảnh lưu cục bộ và ảnh liên kết từ internet.
+4. **Quản lý bảng Videos và quan hệ 1-Nhiều với Users**
+   * Thiết lập quan hệ 1-n: một `User` có thể đăng nhiều `Video` (`@OneToMany`), mỗi `Video` thuộc quyền sở hữu của một `User` (`@ManyToOne` kèm khóa ngoại `userId`).
+   * Thực hiện đầy đủ các chức năng CRUD cho bảng Videos trong khu vực quản trị (`/admin/videos`).
+   * Hiển thị danh sách 10 video mới nhất trên trang chủ (`/home`).
+   * Hiển thị danh sách video của người dùng với tính năng phân trang 6 video/trang tại URL `/video`.
+   * Hỗ trợ phát video trực tiếp và xem chi tiết khi bấm chuột vào tiêu đề của video trên cả trang `/home` và `/video`.
+   * Tải tệp tin poster/video bằng Multipart (`@MultipartConfig`).
 
 ---
 
-## 2. Công nghệ sử dụng
+## 2. Công nghệ và thư viện sử dụng
 
-Dự án quản lý thư viện và vòng đời bản dựng bằng Maven:
-
-* Ngôn ngữ: Java 17 LTS hoặc Java 21 LTS.
-* Nền tảng web: Jakarta EE 10 (Jakarta Servlet 6.1, Jakarta JSP 4.0, Jakarta JSTL 3.0).
-* Máy chủ web: Apache Tomcat 10.1.x hoặc 11.0.x.
-* JPA Provider: Hibernate ORM 6.5.2.Final, Jakarta Persistence API 3.1.0, Hibernate Validator 8.0.
-* Hệ quản trị cơ sở dữ liệu: Microsoft SQL Server (tương thích các phiên bản 2016, 2019, 2022).
-* Trình điều khiển JDBC: Microsoft JDBC Driver for SQL Server 12.6.1 (`mssql-jdbc`).
-* Thư viện tiện ích: Apache Commons-IO 2.16.1 hỗ trợ xử lý luồng dữ liệu file.
-* Đường dẫn lưu trữ ảnh (`Constant.java`): Tự động kiểm tra và sử dụng thư mục theo thứ tự: `E:\upload`, `C:\upload` hoặc `{user.home}/upload`.
+* **Nền tảng:** Java 17 LTS, Jakarta EE 10 (Servlet 6.1, JSP 4.0, JSTL 3.0).
+* **JPA Provider:** Hibernate ORM 6.5.2.Final, Jakarta Persistence API 3.1.0, Hibernate Validator 8.0.
+* **Cơ sở dữ liệu:** Microsoft SQL Server (database: `webst2`), Microsoft JDBC Driver 12.6.1.
+* **Mã hóa:** `org.mindrot:jbcrypt:0.4` (thuật toán băm BCrypt).
+* **Email:** `jakarta.mail:jakarta.mail-api:2.1.3` và `org.eclipse.angus:angus-mail:2.0.3`.
+* **Xử lý tệp tin:** Apache Commons-IO 2.16.1 kết hợp Jakarta Servlet `@MultipartConfig`.
+* **Máy chủ ứng dụng:** Apache Tomcat 11.0.x (hoặc 10.1.x).
 
 ---
 
-## 3. Kiến trúc hệ thống và cấu trúc mã nguồn
-
-Dự án tổ chức theo mô hình MVC kết hợp Service và DAO:
+## 3. Cấu trúc mã nguồn dự án
 
 ```text
 E:\WEb\JPA
-├── pom.xml                                    # File cấu hình thư viện Maven chuẩn Jakarta EE 10
-├── database.sql                               # Script SQL tạo CSDL webst2 và bảng dữ liệu mẫu
-├── build.bat                                  # Script biên dịch và sao chép file WAR vào Tomcat
-├── run-tomcat.bat                             # Script tìm kiếm và khởi động Apache Tomcat
-├── enable-sql-tcp.bat                         # Script cấu hình TCP/IP cổng 1433 cho SQL Server
-├── push-github.bat                            # Script đồng bộ mã nguồn lên GitHub
-├── README.md                                  # Báo cáo kỹ thuật dự án
-│
+├── pom.xml                                    # Khai báo dependency Jakarta EE 10, JPA, Mail, BCrypt
+├── database.sql                               # Script SQL tạo CSDL webst2, bảng users, categories, videos
+├── build.bat                                  # Script biên dịch Maven và tự động deploy file WAR vào Tomcat
+├── run-tomcat.bat                             # Script chạy Apache Tomcat server
+├── README.md                                  # Báo cáo tài liệu hướng dẫn chi tiết
 ├── src\main\resources
-│   └── META-INF
-│       └── persistence.xml                    # Cấu hình Persistence Unit chuẩn JPA 3.0
-│
+│   ├── META-INF
+│   │   └── persistence.xml                    # Cấu hình kết nối SQL Server và ánh xạ các Entity
+│   └── mail.properties.example                # File cấu hình mẫu gửi email qua SMTP Gmail
 ├── src\main\java\vn\iotstar
 │   ├── config
-│   │   ├── JpaConfig.java                     # Khởi tạo EntityManagerFactory và xử lý timeout
-│   │   └── Test.java                          # Kiểm thử kết nối JPA và Hibernate bằng hàm main()
-│   │
+│   │   ├── JpaConfig.java                     # Quản lý EntityManagerFactory dạng Singleton
+│   │   └── Test.java                          # Kiểm thử độc lập JPA và kết nối cơ sở dữ liệu
 │   ├── entity
-│   │   ├── Category.java                      # Entity danh mục (@OneToMany Video)
-│   │   ├── Video.java                         # Entity video (@ManyToOne Category)
-│   │   └── User.java                          # Entity tài khoản người dùng
-│   │
+│   │   ├── Category.java                      # Thực thể danh mục (1-n với Video)
+│   │   ├── User.java                          # Thực thể người dùng (status, code OTP, 1-n với Video)
+│   │   └── Video.java                         # Thực thể video (liên kết khóa ngoại userId và categoryId)
+│   ├── util
+│   │   ├── Constant.java                      # Hằng số hệ thống và đường dẫn thư mục upload
+│   │   ├── EmailUtil.java                     # Tiện ích gửi mã xác thực OTP qua SMTP Gmail
+│   │   └── PasswordUtil.java                  # Tiện ích băm và xác thực mật khẩu BCrypt
 │   ├── dao
-│   │   ├── ICategoryDao.java                  # Interface khai báo 9 phương thức CRUD Category
-│   │   ├── UserDao.java                       # Interface xác thực tài khoản
-│   │   └── impl
-│   │       ├── CategoryDao.java               # Triển khai CRUD Category qua EntityManager
-│   │       └── UserDaoImpl.java               # Triển khai xác thực tài khoản qua JPA
-│   │
+│   │   ├── ICategoryDao.java / CategoryDao.java
+│   │   ├── UserDao.java / UserDaoImpl.java
+│   │   └── IVideoDao.java / VideoDaoImpl.java # Thao tác CSDL: Top 10 mới nhất, phân trang 6sp/trang, CRUD
 │   ├── service
-│   │   ├── ICategoryService.java
-│   │   ├── UserService.java
-│   │   └── impl
-│   │       ├── CategoryServiceImpl.java       # Xử lý logic nghiệp vụ Category
-│   │       └── UserServiceImpl.java           # Xử lý xác thực, đăng ký và mật khẩu
-│   │
-│   ├── controller
-│   │   ├── CategoryController.java            # Servlet CRUD Category (/admin/category/...)
-│   │   ├── DownloadImageController.java       # Servlet phục vụ file ảnh (/image?fname=...)
-│   │   ├── HomeController.java                # Servlet hiển thị danh mục ra trang chủ (/home)
-│   │   ├── LoginController.java               # Servlet đăng nhập và ghi nhớ phiên (/login)
-│   │   ├── RegisterController.java            # Servlet đăng ký tài khoản (/register)
-│   │   ├── LogoutController.java              # Servlet kết thúc phiên làm việc (/logout)
-│   │   └── WaitingController.java             # Servlet điều hướng phân quyền (/waiting)
-│   │
-│   └── util
-│       └── Constant.java                      # Khai báo đường dẫn và định vị thư mục upload
-│
+│   │   ├── ICategoryService.java / CategoryServiceImpl.java
+│   │   ├── UserService.java / UserServiceImpl.java
+│   │   └── IVideoService.java / VideoServiceImpl.java
+│   └── controller
+│       ├── HomeController.java                # Trang chủ: hiển thị 10 video mới nhất và danh mục
+│       ├── LoginController.java               # Đăng nhập với mật khẩu băm, kiểm tra trạng thái OTP
+│       ├── LogoutController.java              # Đăng xuất, hủy session và xóa cookie
+│       ├── RegisterController.java            # Đăng ký tài khoản mới, sinh và gửi OTP
+│       ├── VerifyOtpController.java           # Xác thực mã OTP kích hoạt tài khoản
+│       ├── ForgotPasswordController.java      # Yêu cầu gửi OTP khôi phục mật khẩu
+│       ├── ResetPasswordController.java       # Đặt lại mật khẩu mới với mã OTP
+│       ├── UserVideoController.java           # URL /video: Danh sách video của user, phân trang 6sp/trang
+│       ├── VideoDetailController.java         # URL /video/detail: Phát video và hiển thị chi tiết
+│       ├── VideoController.java               # Khu vực admin: CRUD Video với upload Multipart
+│       ├── CategoryController.java            # Khu vực admin: CRUD Category
+│       └── DownloadImageController.java       # Phục vụ tệp tin ảnh từ thư mục lưu trữ cục bộ
 └── src\main\webapp
-    ├── WEB-INF
-    │   └── web.xml                            # Cấu hình servlet theo chuẩn Servlet 6.1
+    ├── WEB-INF\web.xml                        # File cấu hình web app
     └── views
-        ├── home.jsp                           # Trang chủ hiển thị danh mục
-        ├── login.jsp                          # Trang đăng nhập
-        ├── register.jsp                       # Trang đăng ký
+        ├── home.jsp                           # Giao diện trang chủ với Top 10 video
+        ├── login.jsp                          # Giao diện đăng nhập
+        ├── register.jsp                       # Giao diện đăng ký tài khoản
+        ├── verify-otp.jsp                     # Giao diện xác thực mã OTP
+        ├── forgot-password.jsp                # Giao diện yêu cầu cấp lại mật khẩu
+        ├── reset-password.jsp                 # Giao diện đặt mật khẩu mới
+        ├── video-list.jsp                     # Danh sách video phân trang 6 video/trang (/video)
+        ├── video-detail.jsp                   # Trình phát video HTML5 và thông tin chi tiết
         └── admin
-            ├── category-list.jsp              # Bảng danh sách danh mục
-            ├── category-add.jsp               # Form thêm danh mục
-            └── category-edit.jsp              # Form chỉnh sửa danh mục
+            ├── category-list.jsp / category-add.jsp / category-edit.jsp
+            └── video-list.jsp / video-add.jsp / video-edit.jsp
 ```
 
 ---
 
-## 4. Mô hình thực thể dữ liệu
+## 4. Mô hình dữ liệu và quan hệ thực thể
 
-### A. Thực thể `Category` ([Category.java](src/main/java/vn/iotstar/entity/Category.java))
-Ánh xạ tới bảng `categories` trong CSDL:
+### Bảng `users`
+
+* `id INT IDENTITY(1,1) PRIMARY KEY`: Khóa chính.
+* `username VARCHAR(50) NOT NULL UNIQUE`: Tên tài khoản.
+* `password VARCHAR(255) NOT NULL`: Mật khẩu được băm bằng BCrypt.
+* `email NVARCHAR(150) NULL`: Địa chỉ email nhận OTP.
+* `fullname NVARCHAR(100) NULL`: Họ và tên người dùng.
+* `avatar NVARCHAR(255) NULL`: Ảnh đại diện.
+* `roleid INT NOT NULL DEFAULT 3`: Phân quyền (1: Admin, 2: Manager, 3: User).
+* `phone VARCHAR(20) NULL`: Số điện thoại.
+* `status INT NOT NULL DEFAULT 0`: Trạng thái (0: Chưa kích hoạt, 1: Đã kích hoạt qua OTP).
+* `code VARCHAR(10) NULL`: Mã xác thực OTP 6 số ngẫu nhiên.
+* `createddate DATE NULL`: Ngày đăng ký.
+
+### Bảng `videos`
+
+* `videoId NVARCHAR(50) PRIMARY KEY`: Mã định danh video.
+* `title NVARCHAR(255) NULL`: Tiêu đề video.
+* `description NVARCHAR(MAX) NULL`: Mô tả nội dung.
+* `poster NVARCHAR(255) NULL`: Đường dẫn ảnh đại diện video (tệp tin tải lên hoặc URL).
+* `views INT NOT NULL DEFAULT 0`: Số lượt xem (tự động tăng khi mở xem chi tiết).
+* `active BIT NOT NULL DEFAULT 1`: Trạng thái hiển thị (1: Hiển thị, 0: Ẩn).
+* `categoryId INT NULL`: Khóa ngoại tham chiếu `categories(categoryId)`.
+* `userId INT NULL`: Khóa ngoại tham chiếu `users(id)`.
+
+### Quan hệ JPA giữa các thực thể
+
+* Quan hệ giữa `User` và `Video`: `@OneToMany(mappedBy = "user")` trong `User.java` và `@ManyToOne @JoinColumn(name = "userId")` trong `Video.java`.
+* Quan hệ giữa `Category` và `Video`: `@OneToMany(mappedBy = "category")` trong `Category.java` và `@ManyToOne @JoinColumn(name = "categoryId")` trong `Video.java`.
+
+---
+
+## 5. Chi tiết tính năng xác thực OTP và bảo mật
+
+### Quy trình kích hoạt tài khoản bằng mã OTP
+
+1. Người dùng nhập thông tin tại `/register`.
+2. Hệ thống kiểm tra trùng lặp `username` và `email`.
+3. Sinh mã OTP 6 số qua hàm `EmailUtil.generateOtp()`.
+4. Mật khẩu được băm qua `PasswordUtil.hashPassword()`.
+5. Tạo bản ghi người dùng với `status = 0`, lưu mã `code` vào CSDL.
+6. Gửi email chứa mã OTP đến người dùng.
+7. Chuyển hướng sang `/verify-otp?email=...`. Người dùng nhập mã OTP.
+8. Khi mã khớp, cập nhật `status = 1` và xóa trường `code`. Tài khoản có thể đăng nhập ngay lập tức.
+9. Trường hợp kiểm thử khi không có kết nối SMTP ngoài: Mã OTP luôn được xuất trực tiếp tại cửa sổ console log của Tomcat để quá trình kiểm tra không bị gián đoạn.
+
+### Quy trình đăng nhập và băm mật khẩu
+
+1. Người dùng gửi thông tin tại `/login`.
+2. Hàm `PasswordUtil.checkPassword(plain, hashed)` kiểm tra độ khớp của mật khẩu băm BCrypt.
+3. Nếu đúng thông tin nhưng tài khoản có `status == 0`, hệ thống thông báo lỗi kèm đường dẫn đến trang `/verify-otp`.
+4. Nếu tài khoản hợp lệ (`status == 1`), phiên đăng nhập được lưu vào `session.setAttribute("account", user)`.
+
+### Quy trình quên mật khẩu bằng OTP
+
+1. Người dùng nhập email tại `/forgot-password`.
+2. Hệ thống tìm người dùng tương ứng, sinh mã OTP mới và cập nhật vào `users.code`.
+3. Gửi email thông báo mã xác thực tới người dùng.
+4. Chuyển hướng tới `/reset-password?email=...`.
+5. Người dùng nhập mã OTP, mật khẩu mới và xác nhận mật khẩu mới.
+6. Sau khi xác thực hợp lệ, mật khẩu mới được băm và lưu vào CSDL, xóa mã OTP.
+
+---
+
+## 6. Chi tiết tính năng quản lý Video và phát video
+
+### 1. Hiển thị 10 video mới nhất trên trang chủ (`/home`)
+
+* Truy vấn JPQL:
+
+  ```sql
+  SELECT v FROM Video v WHERE v.active = true ORDER BY v.videoId DESC
+  ```
+
+* Thiết lập giới hạn `.setMaxResults(10)`.
+* Hiển thị dạng thẻ lưới với poster, số lượt xem, người tải lên và tiêu đề.
+* Người dùng click chuột vào tiêu đề video sẽ được chuyển tiếp sang trang phát video chi tiết.
+
+### 2. Danh sách video của User phân trang 6 video/trang (`/video`)
+
+* URL truy cập: `/video` hoặc `/video?page=1`.
+* Khi người dùng đã đăng nhập, hệ thống lọc các video thuộc quyền sở hữu của người dùng hiện tại (`user.id`). Nếu người dùng chưa đăng nhập, hệ thống hiển thị danh sách video gợi ý chung.
+* Sử dụng kỹ thuật phân trang JPA:
+
+  ```java
+  query.setFirstResult((page - 1) * 6);
+  query.setMaxResults(6);
+  ```
+
+* Tính tổng số trang: `totalPages = (int) Math.ceil((double) totalVideos / 6)`.
+* Thanh điều hướng trang hiển thị nút trước, danh sách số trang và nút sau.
+
+### 3. Chi tiết và phát video (`/video/detail?id=...`)
+
+* Nhận tham số `id` của video.
+* Tự động gọi phương thức `increaseViews(id)` để tăng số lượt xem lên 1.
+* Trình phát video HTML5 Responsive hỗ trợ định dạng MP4 cùng ảnh poster xem trước.
+* Hiển thị thông tin người đăng, danh mục liên kết, lượt xem và mô tả chi tiết.
+* Cột bên cạnh hiển thị danh sách các video đề xuất khác, cho phép bấm chuyển video liên tục.
+
+### 4. Quản trị Video (CRUD)
+
+* Endpoint `/admin/videos`: Liệt kê bảng danh sách video với các cột Poster, Tiêu đề, Danh mục, Người đăng, Lượt xem, Trạng thái.
+* Endpoint `/admin/video/add`: Thêm video mới với tùy chọn tải ảnh poster qua Multipart hoặc dán URL trực tiếp.
+* Endpoint `/admin/video/edit?id=...`: Chỉnh sửa thông tin video.
+* Endpoint `/admin/video/delete?id=...`: Xóa video khỏi hệ thống.
+
+---
+
+## 7. Hướng dẫn xử lý upload file bằng Multipart
+
+Cấu hình Servlet hỗ trợ Multipart theo tiêu chuẩn Jakarta EE 10:
+
 ```java
-@Entity
-@Table(name = "categories")
-@NamedQuery(name = "Category.findAll", query = "SELECT c FROM Category c")
-public class Category implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "categoryId")
-    private int categoryId;
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+    maxFileSize = 1024 * 1024 * 50,      // 50MB
+    maxRequestSize = 1024 * 1024 * 100    // 100MB
+)
+```
 
-    @Column(name = "categoryname", columnDefinition = "NVARCHAR(255) NULL")
-    @NotEmpty(message = "Không được phép rỗng")
-    private String categoryname;
+Xử lý lưu file trong Servlet:
 
-    @Column(name = "images", columnDefinition = "NVARCHAR(255) NULL")
-    private String images;
-
-    @Column(name = "status")
-    private int status; // 1: Hoạt động, 0: Tạm khóa
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Video> videos = new ArrayList<>();
-    // getters, setters, addVideo, removeVideo
+```java
+Part part = req.getPart("posterFile");
+if (part != null && part.getSize() > 0) {
+    String uploadPath = Constant.getUploadDir();
+    String submittedFileName = part.getSubmittedFileName();
+    String ext = submittedFileName.substring(submittedFileName.lastIndexOf("."));
+    String newFileName = System.currentTimeMillis() + ext;
+    part.write(uploadPath + File.separator + newFileName);
+    video.setPoster(newFileName);
 }
 ```
 
-### B. Thực thể `Video` ([Video.java](src/main/java/vn/iotstar/entity/Video.java))
-Ánh xạ tới bảng `videos`, thể hiện quan hệ nhiều-1 với Category:
-```java
-@Entity
-@Table(name = "videos")
-@NamedQuery(name = "Video.findAll", query = "SELECT v FROM Video v")
-public class Video implements Serializable {
-    @Id
-    @Column(name = "videoId")
-    private String videoId;
-
-    @Column(name = "title", columnDefinition = "NVARCHAR(255) NULL")
-    private String title;
-
-    @Column(name = "poster", columnDefinition = "NVARCHAR(255) NULL")
-    private String poster;
-
-    @Column(name = "views")
-    private int views;
-
-    @Column(name = "description", columnDefinition = "NVARCHAR(MAX) NULL")
-    private String description;
-
-    @Column(name = "active")
-    private boolean active;
-
-    @ManyToOne
-    @JoinColumn(name = "categoryId")
-    private Category category;
-    // getters, setters
-}
-```
-
-### C. Thực thể `User` ([User.java](src/main/java/vn/iotstar/entity/User.java))
-Ánh xạ tới bảng `users` phục vụ xác thực và phân quyền:
-* `id` (`INT`, khóa chính tự tăng).
-* `userName` (`VARCHAR(50)`, giá trị duy nhất, không rỗng).
-* `passWord` (`VARCHAR(255)`, mật khẩu lưu trữ).
-* `fullName` (`NVARCHAR(100)`, họ tên người dùng).
-* `email` (`NVARCHAR(150)`, địa chỉ email).
-* `phone` (`VARCHAR(20)`, số điện thoại liên hệ).
-* `roleid` (`INT`, phân quyền: `1` là Quản trị viên, `2` là Quản lý, `3` là Người dùng thường).
-* `createdDate` (`DATE`, thời điểm tạo tài khoản).
+Thư mục lưu trữ: Hệ thống tự động phát hiện phân vùng đĩa sẵn có (`E:\upload`, `C:\upload` hoặc thư mục người dùng) và tự động tạo thư mục nếu chưa tồn tại.
 
 ---
 
-## 5. Chi tiết tầng xử lý dữ liệu
+## 8. Hướng dẫn thiết lập cơ sở dữ liệu SQL Server
 
-Các thao tác dữ liệu được thực thi thông qua `EntityManager` và JPQL:
+1. Mở SQL Server Management Studio (SSMS) hoặc Azure Data Studio.
+2. Mở file `database.sql` trong thư mục gốc dự án.
+3. Chạy toàn bộ nội dung script để tạo cơ sở dữ liệu `webst2`, bảng `categories`, `users`, `videos` và dữ liệu mẫu:
 
-| Phương thức trong ICategoryDao | Cách triển khai qua JPA / JPQL | Mô tả chức năng |
-| :--- | :--- | :--- |
-| `insert(Category category)` | `enma.persist(category)` trong giao dịch `trans.begin()` và `commit()` | Thêm danh mục mới vào CSDL. |
-| `update(Category category)` | `enma.merge(category)` trong giao dịch `trans.begin()` và `commit()` | Cập nhật thông tin danh mục. |
-| `delete(int cateid)` | `enma.remove(enma.find(Category.class, cateid))` | Xóa danh mục theo ID. |
-| `findById(int cateid)` | `enma.find(Category.class, cateid)` | Truy vấn danh mục theo khóa chính. |
-| `findByCategoryname(String name)` | `SELECT c FROM Category c WHERE c.categoryname = :catename` | Tìm danh mục theo tên chính xác. |
-| `findAll()` | `enma.createNamedQuery("Category.findAll", Category.class)` | Lấy toàn bộ danh sách danh mục. |
-| `searchByName(String catname)` | `SELECT c FROM Category c WHERE c.categoryname LIKE :catname` | Tìm kiếm danh mục chứa từ khóa. |
-| `findAll(int page, int pagesize)` | Query kết hợp `setFirstResult(page * pagesize)` và `setMaxResults(pagesize)` | Phân trang danh mục sản phẩm. |
-| `count()` | `SELECT count(c) FROM Category c` | Đếm tổng số lượng danh mục hiện có. |
+   ```cmd
+   sqlcmd -S 127.0.0.1,1433 -U sa -P "1234567@a$" -i database.sql
+   ```
+
+4. Đảm bảo dịch vụ SQL Server đã bật giao thức TCP/IP trên cổng 1433. Nếu cần bật tự động, có thể chạy tệp `enable-sql-tcp.bat`.
 
 ---
 
-## 6. Hướng dẫn thiết lập cơ sở dữ liệu SQL Server
+## 9. Hướng dẫn biên dịch và triển khai ứng dụng
 
-### Bước 6.1: Khởi tạo dữ liệu bằng database.sql
-1. Mở SQL Server Management Studio (SSMS) và kết nối vào máy chủ SQL Server.
-2. Mở file `database.sql` trong thư mục dự án `E:\WEb\JPA`.
-3. Bấm phím F5 (hoặc chọn Execute) để chạy script:
-   * Tạo cơ sở dữ liệu `webst2`.
-   * Tạo các bảng `categories`, `videos`, `users`.
-   * Chèn dữ liệu mẫu cho danh mục và tài khoản thử nghiệm.
+### Biên dịch tự động qua script
 
-### Bước 6.2: Cấu hình giao thức TCP/IP và cổng 1433
-Áp dụng khi sử dụng SQL Server phiên bản Named Instance (như `SERVER2022`), do dịch vụ mạng mặc định có thể chưa bật TCP/IP:
+1. Chạy file `build.bat` tại thư mục dự án:
 
-Lựa chọn một trong hai cách:
+   ```cmd
+   build.bat
+   ```
 
-#### Cách 1: Sử dụng script batch
-1. Mở thư mục dự án `E:\WEb\JPA`.
-2. Chạy file `enable-sql-tcp.bat` với quyền Administrator.
-3. Script cấu hình Registry để kích hoạt TCP/IP trên cổng `1433` cho mục `IPAll`, sau đó khởi động lại dịch vụ SQL Server.
+   Script sẽ tự động:
+   * Biên dịch mã nguồn với Maven và JDK 17.
+   * Tạo tệp `target\JPA_Servlet_Category.war`.
+   * Tự động sao chép file WAR vào thư mục `webapps` của Apache Tomcat (`E:\apache-tomcat-11.0.27\webapps` hoặc `C:\apache-tomcat-11.0.27\webapps`).
 
-#### Cách 2: Cấu hình thủ công qua SQL Server Configuration Manager
-1. Mở hộp thoại Run (`Win + R`), nhập `SQLServerManager16.msc` và nhấn Enter.
-2. Điều hướng theo cây thư mục bên trái:
-   **SQL Server Network Configuration** &rarr; **Protocols for SERVER2022** (hoặc instance tương ứng).
-3. Nhấp đúp vào **TCP/IP**, chuyển giá trị **Enabled** sang **Yes**.
-4. Chuyển sang tab **IP Addresses**, cuộn xuống mục **IPAll**:
-   * **TCP Dynamic Ports:** Để trống.
-   * **TCP Port:** Nhập giá trị `1433`.
-5. Chọn **Apply** rồi chọn **OK**.
-6. Chọn mục **SQL Server Services** ở danh mục bên trái, nhấp chuột phải vào dịch vụ `SQL Server (SERVER2022)` và chọn **Restart**.
+### Khởi động máy chủ Tomcat
 
-### Bước 6.3: Cấu hình tệp persistence.xml
-Tệp `src/main/resources/META-INF/persistence.xml` thiết lập kết nối tới cơ sở dữ liệu:
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence 
-                                 https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+1. Chạy tệp `run-tomcat.bat` hoặc chạy trực tiếp `startup.bat` trong thư mục Tomcat:
 
-    <persistence-unit name="jpa-hibernate-mysql" transaction-type="RESOURCE_LOCAL">
-        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        
-        <class>vn.iotstar.entity.Category</class>
-        <class>vn.iotstar.entity.Video</class>
-        <class>vn.iotstar.entity.User</class>
-        
-        <properties>
-            <!-- Cấu hình JDBC Driver và kết nối Microsoft SQL Server cổng 1433 -->
-            <property name="jakarta.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:sqlserver://127.0.0.1:1433;encrypt=true;trustServerCertificate=true;loginTimeout=5;connectRetryCount=0;databaseName=webst2" />
-            <property name="jakarta.persistence.jdbc.user" value="sa" />
-            <property name="jakarta.persistence.jdbc.password" value="1234567@a$" />
-            
-            <!-- Cấu hình Hibernate 6.x -->
-            <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect" />
-            <property name="hibernate.show_sql" value="true" />
-            <property name="hibernate.format_sql" value="true" />
-            <property name="hibernate.hbm2ddl.auto" value="update" />
+   ```cmd
+   E:\apache-tomcat-11.0.27\bin\startup.bat
+   ```
 
-            <!-- Connection Pool C3P0 -->
-            <property name="hibernate.c3p0.min_size" value="5" />
-            <property name="hibernate.c3p0.max_size" value="20" />
-            <property name="hibernate.c3p0.timeout" value="300" />
-        </properties>
-    </persistence-unit>
-</persistence>
-```
+2. Truy cập ứng dụng tại địa chỉ:
 
----
-
-## 7. Kiểm thử kết nối JPA độc lập (Test.java)
-
-Quy trình kiểm tra hoạt động của JPA ngoài môi trường web:
-1. Mở dự án trong IDE (IntelliJ IDEA, Eclipse hoặc VS Code).
-2. Mở tệp `src/main/java/vn/iotstar/config/Test.java`.
-3. Chạy hàm `main()` (trong IntelliJ: chọn **Run 'Test.main()'** hoặc bấm `Ctrl + Shift + F10`).
-4. Kết quả ghi nhận tại Console: Hibernate thực thi lệnh tạo bảng và chèn bản ghi mẫu:
    ```text
-   ==================================================
-      BAT DAU KIEM TRA KET NOI VA THAO TAC VOI JPA   
-   ==================================================
-   Hibernate: insert into categories (categoryname, images, status) values (?, ?, ?)
-   Hibernate: insert into videos (active, categoryId, description, poster, title, views, videoId) values (?, ?, ?, ?, ?, ?, ?)
-   >>> SUCCESS: Da them thanh cong Category: Iphone (ID: 1) va Video: v01 vao CSDL!
-   ==================================================
-      HOAN TAT QUA TRINH TEST JPA                    
-   ==================================================
+   http://localhost:8080/JPA_Servlet_Category/home
    ```
 
 ---
 
-## 8. Hướng dẫn khởi động ứng dụng trên Tomcat
+## 10. Bảng điều hướng URL và tài khoản kiểm thử
 
-Ứng dụng có thể triển khai theo ba cách:
+### Bảng danh sách URL chính
 
-### Cách 1: Sử dụng script batch
-1. **Đóng gói file WAR:**
-   * Chạy file `build.bat`.
-   * Script gọi Maven biên dịch mã nguồn, đóng gói thành `target/JPA_Servlet_Category.war` và sao chép vào thư mục `webapps` của Tomcat.
-2. **Khởi động Tomcat:**
-   * Chạy file `run-tomcat.bat`.
-   * Script tự động tìm đường dẫn `%CATALINA_HOME%` hoặc quét Tomcat trên các phân vùng đĩa khả dụng để khởi chạy.
-3. Truy cập ứng dụng qua các URL ở mục 9.
+| Chức năng | Đường dẫn (URL) | Ghi chú |
+| :--- | :--- | :--- |
+| **Trang chủ** | `/home` | Hiển thị 10 video mới nhất và danh mục |
+| **Video của User** | `/video` | Phân trang 6 video/trang |
+| **Phát & Chi tiết Video** | `/video/detail?id=v01` | Mở xem khi bấm vào tiêu đề video |
+| **Đăng ký tài khoản** | `/register` | Nhập thông tin, tạo mã OTP |
+| **Xác thực OTP** | `/verify-otp` | Kích hoạt tài khoản người dùng |
+| **Đăng nhập** | `/login` | Xác thực mật khẩu băm BCrypt |
+| **Quên mật khẩu** | `/forgot-password` | Nhận mã OTP đổi mật khẩu qua email |
+| **Đặt lại mật khẩu** | `/reset-password` | Nhập mã OTP và mật khẩu mới |
+| **Đăng xuất** | `/logout` | Xóa phiên đăng nhập |
+| **Quản trị Videos** | `/admin/videos` | CRUD danh sách video |
+| **Thêm Video mới** | `/admin/video/add` | Hỗ trợ upload ảnh Multipart |
+| **Quản trị Danh mục** | `/admin/categories` | CRUD danh mục sản phẩm JPA |
 
-### Cách 2: Chạy bằng plugin Smart Tomcat trong IntelliJ IDEA
-1. Mở thư mục dự án trong IntelliJ IDEA.
-2. Cài đặt plugin Smart Tomcat qua menu `File` &rarr; `Settings` &rarr; `Plugins`.
-3. Tạo cấu hình chạy:
-   * Vào menu `Run` &rarr; `Edit Configurations...`, bấm nút dấu cộng và chọn **Smart Tomcat**.
-   * **Tomcat Server:** Chọn thư mục cài đặt Tomcat trên máy (ví dụ `C:\apache-tomcat-11.0.27`).
-   * **Deployment Directory:** Trỏ đến thư mục `src/main/webapp`.
-   * **Context Path:** Điền `/JPA_Servlet_Category`.
-   * **Server Port:** `8080`.
-4. Bấm **Apply** &rarr; **OK**, sau đó bấm **Run** để khởi động máy chủ.
+### Tài khoản mẫu kiểm thử
 
-### Cách 3: Triển khai thủ công bằng file WAR
-1. Mở terminal tại thư mục gốc của dự án và chạy lệnh:
-   ```bash
-   mvn clean package -DskipTests
-   ```
-2. Sau khi bản dựng hoàn tất, sao chép file `target/JPA_Servlet_Category.war` vào thư mục `webapps/` của Apache Tomcat.
-3. Chạy lệnh `bin/startup.bat` (trên Windows) hoặc `./bin/startup.sh` (trên Linux/macOS) để bật máy chủ.
-
----
-
-## 9. Bảng điều hướng URL và tài khoản kiểm thử
-
-Sau khi máy chủ khởi động, truy cập các địa chỉ tương ứng:
-
-### Bảng điều hướng hệ thống
-| Chức năng | Đường dẫn (URL) | Phương thức | Quyền truy cập | Ghi chú |
-| :--- | :--- | :---: | :--- | :--- |
-| Quản lý Category | [http://localhost:8080/JPA_Servlet_Category/admin/categories](http://localhost:8080/JPA_Servlet_Category/admin/categories) | `GET` | Quản trị viên (Admin) | Danh sách danh mục, trạng thái và nút sửa/xóa. |
-| Thêm mới Category | [http://localhost:8080/JPA_Servlet_Category/admin/category/add](http://localhost:8080/JPA_Servlet_Category/admin/category/add) | `GET`/`POST` | Quản trị viên (Admin) | Form thêm danh mục, hỗ trợ tải file ảnh hoặc nhập link ngoài. |
-| Trang chủ | [http://localhost:8080/JPA_Servlet_Category/home](http://localhost:8080/JPA_Servlet_Category/home) | `GET` | Tất cả người dùng | Hiển thị các danh mục đang kích hoạt (status = 1). |
-| Trang Đăng nhập | [http://localhost:8080/JPA_Servlet_Category/login](http://localhost:8080/JPA_Servlet_Category/login) | `GET`/`POST` | Tất cả người dùng | Xác thực tài khoản và hỗ trợ lưu cookie đăng nhập. |
-| Trang Đăng ký | [http://localhost:8080/JPA_Servlet_Category/register](http://localhost:8080/JPA_Servlet_Category/register) | `GET`/`POST` | Khách vãng lai | Đăng ký tài khoản mới và kiểm tra trùng lặp email/username. |
-| Đăng xuất | [http://localhost:8080/JPA_Servlet_Category/logout](http://localhost:8080/JPA_Servlet_Category/logout) | `GET` | Người dùng đã đăng nhập | Hủy session và chuyển hướng về trang đăng nhập. |
-
-### Tài khoản kiểm thử
-* **Quản trị viên (Admin):**
+* **Tài khoản Quản trị viên (Admin)**
   * Tên đăng nhập: `admin`
   * Mật khẩu: `123` (hoặc `123456`)
-  * Điều hướng sau đăng nhập: Servlet `/waiting` chuyển hướng vào khu vực quản trị `/admin/categories`.
-* **Người dùng thường (User):**
+  * Vai trò: Toàn quyền quản trị danh mục và video
+* **Tài khoản Người dùng (User)**
   * Tên đăng nhập: `user`
   * Mật khẩu: `123` (hoặc `123456`)
-  * Điều hướng sau đăng nhập: Chuyển hướng về trang chủ `/home`.
-
----
-
-## 10. Cơ chế xử lý timeout và dữ liệu dự phòng
-
-Dự án xử lý tình huống mất kết nối cơ sở dữ liệu qua hai cơ chế:
-
-1. **Ngắt nghẽn kết nối trong [JpaConfig.java](src/main/java/vn/iotstar/config/JpaConfig.java):**
-   * Sử dụng biến đếm chu kỳ kiểm tra (`RETRY_INTERVAL_MS = 15000`). Nếu kết nối CSDL chưa hoàn tất, hệ thống không lặp lại yêu cầu kết nối liên tục trên từng request HTTP, tránh tình trạng treo luồng xử lý của servlet.
-2. **Dữ liệu dự phòng trong [CategoryDao.java](src/main/java/vn/iotstar/dao/impl/CategoryDao.java) và [UserDaoImpl.java](src/main/java/vn/iotstar/dao/impl/UserDaoImpl.java):**
-   * Khi dịch vụ SQL Server chưa khởi động xong, hệ thống nạp danh sách dự phòng trong bộ nhớ, cho phép kiểm tra giao diện và luồng điều hướng của tài khoản `admin`. Khi CSDL kết nối thành công, DAO tự động chuyển về đọc ghi trên CSDL thật.
-
----
-
-## 11. Hướng dẫn xử lý sự cố thường gặp
-
-1. **Lỗi `Connection refused: getsockopt` hoặc không thể kết nối tới cổng 1433:**
-   * *Nguyên nhân:* Giao thức TCP/IP của SQL Server chưa được bật hoặc chưa gán cổng 1433.
-   * *Cách xử lý:* Chạy file `enable-sql-tcp.bat` với quyền Administrator hoặc cấu hình lại cổng 1433 cho mục `IPAll` trong SQL Server Configuration Manager.
-2. **Danh mục mới tạo không hiển thị ở trang chủ:**
-   * *Nguyên nhân:* Thuộc tính trạng thái của danh mục đang để giá trị `0` (khóa). Trang chủ chỉ truy vấn các bản ghi có `status = 1`.
-   * *Cách xử lý:* Vào trang quản trị danh mục, chọn sửa bản ghi và cập nhật trạng thái sang `1`.
-3. **Ảnh tải lên không hiển thị:**
-   * *Nguyên nhân và cơ chế:* File ảnh được lưu tại thư mục upload cục bộ (`E:\upload` hoặc `C:\upload`) và phục vụ qua servlet `DownloadImageController` (`/image?fname=...`). Cần đảm bảo thư mục upload có quyền ghi và tên file trùng khớp với giá trị lưu trong CSDL.
-
----
-
-Đường dẫn repository nộp bài: [https://github.com/TBL251/JPA.git](https://github.com/TBL251/JPA.git)
+  * Vai trò: Xem video cá nhân, xem chi tiết và phát video
