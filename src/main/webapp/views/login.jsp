@@ -61,8 +61,7 @@
         </form>
 
         <div class="footer-links">
-            Chưa có tài khoản? <a href="<c:url value="/register"/>">Đăng ký ngay</a> | 
-            <a href="<c:url value="/verify-otp"/>">Kích hoạt OTP</a>
+            Chưa có tài khoản? <a href="<c:url value="/register"/>">Đăng ký ngay</a>
         </div>
         <div class="direct-link">
             <a href="<c:url value="/home"/>">&larr; Về Trang Chủ</a>

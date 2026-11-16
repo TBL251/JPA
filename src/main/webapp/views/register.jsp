@@ -62,8 +62,7 @@
         </form>
 
         <div class="footer-links">
-            Đã có tài khoản? <a href="<c:url value='/login'/>">Đăng nhập ngay</a> |
-            <a href="<c:url value='/verify-otp'/>">Nhập mã OTP</a>
+            Đã có tài khoản? <a href="<c:url value='/login'/>">Đăng nhập ngay</a>
         </div>
     </div>
 </body>
