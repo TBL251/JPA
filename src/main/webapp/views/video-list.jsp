@@ -46,7 +46,7 @@
         <a href="<c:url value="/home"/>" class="navbar-brand">&#9654; HCMUTE VIDEO & SHOPPING</a>
         <div class="navbar-menu">
             <a href="<c:url value="/home"/>">Trang Chủ</a>
-            <a href="<c:url value="/video"/>" class="active">Video Của Tôi (/video)</a>
+            <a href="<c:url value="/video"/>" class="active">Video Của Tôi</a>
             <c:if test="${not empty sessionScope.account && (sessionScope.account.roleid == 1 || sessionScope.account.roleid == 2)}">
                 <a href="<c:url value="/admin/videos"/>" style="color: #f59e0b; font-weight: 600;">[Quản Lý Videos]</a>
                 <a href="<c:url value="/admin/categories"/>" style="color: #38bdf8; font-weight: 600;">[Quản Trị Category]</a>

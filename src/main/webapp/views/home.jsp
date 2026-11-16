@@ -54,7 +54,7 @@
         </a>
         <div class="navbar-menu">
             <a href="<c:url value="/home"/>" class="active">Trang Chủ</a>
-            <a href="<c:url value="/video"/>">Video Của Tôi (/video)</a>
+            <a href="<c:url value="/video"/>">Video Của Tôi</a>
             <c:if test="${not empty sessionScope.account && (sessionScope.account.roleid == 1 || sessionScope.account.roleid == 2)}">
                 <a href="<c:url value="/admin/videos"/>" style="color: #f59e0b; font-weight: 600;">[Quản Lý Videos]</a>
                 <a href="<c:url value="/admin/categories"/>" style="color: #38bdf8; font-weight: 600;">[Quản Trị Category]</a>
@@ -76,7 +76,7 @@
         <h1>Nền Tảng Đa Phương Tiện & Mua Sắm JPA 3.0</h1>
         <p>Phát triển bởi Khoa CNTT - Đại học Sư phạm Kỹ thuật TP.HCM (HCMUTE)</p>
         <div style="display: flex; justify-content: center; gap: 15px;">
-            <a href="<c:url value="/video"/>" class="btn" style="padding: 10px 20px; background: #059669;">Xem Tất Cả Video Của Bạn (/video) &rarr;</a>
+            <a href="<c:url value="/video"/>" class="btn" style="padding: 10px 20px; background: #059669;">Xem Tất Cả Video Của Bạn &rarr;</a>
             <c:if test="${empty sessionScope.account}">
                 <a href="<c:url value="/register"/>" class="btn" style="padding: 10px 20px; background: #2563eb;">Đăng Ký Tài Khoản OTP &rarr;</a>
             </c:if>

@@ -53,7 +53,7 @@
         <a href="<c:url value="/home"/>" class="navbar-brand">&#9654; HCMUTE VIDEO & SHOPPING</a>
         <div class="navbar-menu">
             <a href="<c:url value="/home"/>">Trang Chủ</a>
-            <a href="<c:url value="/video"/>">Video Của Tôi (/video)</a>
+            <a href="<c:url value="/video"/>">Video Của Tôi</a>
             <c:if test="${not empty sessionScope.account && (sessionScope.account.roleid == 1 || sessionScope.account.roleid == 2)}">
                 <a href="<c:url value="/admin/videos"/>" style="color: #f59e0b;">[Quản Lý Videos]</a>
                 <a href="<c:url value="/admin/categories"/>" style="color: #38bdf8;">[Quản Trị Category]</a>
@@ -122,7 +122,7 @@
                 </div>
 
                 <div class="actions-bar">
-                    <a href="<c:url value="/video"/>" class="btn-action btn-primary">&larr; Về trang Video Của Tôi (/video)</a>
+                    <a href="<c:url value="/video"/>" class="btn-action btn-primary">&larr; Về trang Video Của Tôi</a>
                     <a href="<c:url value="/home"/>" class="btn-action">&larr; Về Trang Chủ</a>
                     <button type="button" class="btn-action" onclick="alert('Đã lưu video vào danh sách yêu thích!');">&#9733; Yêu thích</button>
                     <button type="button" class="btn-action" onclick="navigator.clipboard.writeText(window.location.href); alert('Đã sao chép liên kết video!');">&#128279; Chia sẻ liên kết</button>

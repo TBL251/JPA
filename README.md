@@ -48,92 +48,81 @@ Dự án hoàn thiện các yêu cầu mở rộng trên nền tảng JPA 3.0 v�
    * Chức năng đăng xuất (`/logout`) hủy phiên làm việc và xóa cookie ghi nhớ.
 
 3. **Quên mật khẩu gửi mã xác nhận OTP qua Email**
-   * Endpoint `/forgot-password` tiếp nhận địa chỉ email đã đăng ký.
-   * Tạo mã OTP mới, cập nhật vào bảng `users` và gửi email xác nhận.
-   * Người dùng nhập mã OTP và mật khẩu mới tại `/reset-password`. Khi xác thực hợp lệ, mật khẩu mới được băm và cập nhật vào cơ sở dữ liệu.
+   * Người dùng nhập địa chỉ email đã đăng ký tại `/forgot-password`.
+   * Hệ thống tạo mã OTP mới, lưu vào CSDL và gửi email xác nhận.
+   * Chuyển hướng sang `/reset-password` để người dùng nhập OTP và đổi mật khẩu mới bảo mật.
 
-4. **Quản lý bảng Videos và quan hệ 1-Nhiều với Users**
-   * Thiết lập quan hệ 1-n: một `User` có thể đăng nhiều `Video` (`@OneToMany`), mỗi `Video` thuộc quyền sở hữu của một `User` (`@ManyToOne` kèm khóa ngoại `userId`).
-   * Thực hiện đầy đủ các chức năng CRUD cho bảng Videos trong khu vực quản trị (`/admin/videos`).
-   * Hiển thị danh sách 10 video mới nhất trên trang chủ (`/home`).
-   * Hiển thị danh sách video của người dùng với tính năng phân trang 6 video/trang tại URL `/video`.
-   * Hỗ trợ phát video trực tiếp và xem chi tiết khi bấm chuột vào tiêu đề của video trên cả trang `/home` và `/video`.
-   * Tải tệp tin poster/video bằng Multipart (`@MultipartConfig`).
+4. **Thêm bảng `Videos` có quan hệ 1-n với bảng `users`**
+   * Tạo bảng `videos` với khóa ngoại `userId` trỏ tới `users(id)` và khóa ngoại `categoryId` trỏ tới `categories(categoryId)`.
+   * Xây dựng Entity `Video.java` với các annotation JPA 3.0 (`@ManyToOne`, `@JoinColumn`).
+   * Xây dựng đầy đủ tầng `VideoDao` và `VideoService`.
+
+5. **Quản lý Video (CRUD) cho Admin và Phân quyền**
+   * Giao diện quản lý danh sách video (`/admin/videos`) với tính năng xem, thêm, sửa, xóa.
+   * Hỗ trợ upload ảnh đại diện (Poster) đa phương tiện bằng chuẩn Multipart của Jakarta Servlet.
+
+6. **Hiển thị 10 video mới nhất trên trang chủ (`/home`)**
+   * Truy vấn lấy 10 video có trạng thái hoạt động mới nhất theo mã hoặc ngày tạo.
+   * Hiển thị lưới thẻ video trực quan kèm thông tin người tải lên, số lượt xem và liên kết phát video.
+
+7. **Hiển thị danh sách video của User với phân trang 6 video/trang (`/video`)**
+   * Phân trang JPA với `setFirstResult` và `setMaxResults` (6 video trên 1 trang).
+   * Điều hướng trang (trước, các trang số, sau) mượt mà.
+
+8. **Hiển thị chi tiết và phát video (Play Video) khi bấm vào tiêu đề**
+   * Mở trang xem video (`/video/detail?id=...`) với trình phát HTML5 responsive.
+   * Tự động tăng lượt xem (`views`) mỗi khi người dùng mở video.
+   * Hiển thị thông tin tác giả, danh mục và danh sách video gợi ý liên quan.
 
 ---
 
 ## 2. Công nghệ và thư viện sử dụng
 
-* **Nền tảng:** Java 17 LTS, Jakarta EE 10 (Servlet 6.1, JSP 4.0, JSTL 3.0).
-* **JPA Provider:** Hibernate ORM 6.5.2.Final, Jakarta Persistence API 3.1.0, Hibernate Validator 8.0.
-* **Cơ sở dữ liệu:** Microsoft SQL Server (database: `webst2`), Microsoft JDBC Driver 12.6.1.
-* **Mã hóa:** `org.mindrot:jbcrypt:0.4` (thuật toán băm BCrypt).
-* **Email:** `jakarta.mail:jakarta.mail-api:2.1.3` và `org.eclipse.angus:angus-mail:2.0.3`.
-* **Xử lý tệp tin:** Apache Commons-IO 2.16.1 kết hợp Jakarta Servlet `@MultipartConfig`.
-* **Máy chủ ứng dụng:** Apache Tomcat 11.0.x (hoặc 10.1.x).
+* **Nền tảng chính:** Java 17 (JBR 17), Jakarta EE 10, Servlet 6.0, JSP 3.1.
+* **ORM & Database:** Hibernate Core 6.6.x (JPA 3.0), SQL Server JDBC Driver (`mssql-jdbc:12.8.1.jre11`).
+* **Bảo mật & Mã hóa:** jBCrypt 0.4 (Băm mật khẩu `BCrypt.hashpw` và `BCrypt.checkpw`).
+* **Dịch vụ Email:** Jakarta Mail API 2.1.3 (`jakarta.mail-api`) và Angus Mail 2.0.3 (`org.eclipse.angus:angus-mail`).
+* **Template Engine:** JSTL 3.0.0 (`jakarta.servlet.jsp.jstl`).
+* **Máy chủ ứng dụng:** Apache Tomcat 11.0.27.
 
 ---
 
 ## 3. Cấu trúc mã nguồn dự án
 
 ```text
-E:\WEb\JPA
-├── pom.xml                                    # Khai báo dependency Jakarta EE 10, JPA, Mail, BCrypt
-├── database.sql                               # Script SQL tạo CSDL webst2, bảng users, categories, videos
-├── build.bat                                  # Script biên dịch Maven và tự động deploy file WAR vào Tomcat
-├── run-tomcat.bat                             # Script chạy Apache Tomcat server
-├── README.md                                  # Báo cáo tài liệu hướng dẫn chi tiết
-├── src\main\resources
-│   ├── META-INF
-│   │   └── persistence.xml                    # Cấu hình kết nối SQL Server và ánh xạ các Entity
-│   └── mail.properties.example                # File cấu hình mẫu gửi email qua SMTP Gmail
-├── src\main\java\vn\iotstar
-│   ├── config
-│   │   ├── JpaConfig.java                     # Quản lý EntityManagerFactory dạng Singleton
-│   │   └── Test.java                          # Kiểm thử độc lập JPA và kết nối cơ sở dữ liệu
-│   ├── entity
-│   │   ├── Category.java                      # Thực thể danh mục (1-n với Video)
-│   │   ├── User.java                          # Thực thể người dùng (status, code OTP, 1-n với Video)
-│   │   └── Video.java                         # Thực thể video (liên kết khóa ngoại userId và categoryId)
-│   ├── util
-│   │   ├── Constant.java                      # Hằng số hệ thống và đường dẫn thư mục upload
-│   │   ├── EmailUtil.java                     # Tiện ích gửi mã xác thực OTP qua SMTP Gmail
-│   │   └── PasswordUtil.java                  # Tiện ích băm và xác thực mật khẩu BCrypt
-│   ├── dao
-│   │   ├── ICategoryDao.java / CategoryDao.java
-│   │   ├── UserDao.java / UserDaoImpl.java
-│   │   └── IVideoDao.java / VideoDaoImpl.java # Thao tác CSDL: Top 10 mới nhất, phân trang 6sp/trang, CRUD
-│   ├── service
-│   │   ├── ICategoryService.java / CategoryServiceImpl.java
-│   │   ├── UserService.java / UserServiceImpl.java
-│   │   └── IVideoService.java / VideoServiceImpl.java
-│   └── controller
-│       ├── HomeController.java                # Trang chủ: hiển thị 10 video mới nhất và danh mục
-│       ├── LoginController.java               # Đăng nhập với mật khẩu băm, kiểm tra trạng thái OTP
-│       ├── LogoutController.java              # Đăng xuất, hủy session và xóa cookie
-│       ├── RegisterController.java            # Đăng ký tài khoản mới, sinh và gửi OTP
-│       ├── VerifyOtpController.java           # Xác thực mã OTP kích hoạt tài khoản
-│       ├── ForgotPasswordController.java      # Yêu cầu gửi OTP khôi phục mật khẩu
-│       ├── ResetPasswordController.java       # Đặt lại mật khẩu mới với mã OTP
-│       ├── UserVideoController.java           # URL /video: Danh sách video của user, phân trang 6sp/trang
-│       ├── VideoDetailController.java         # URL /video/detail: Phát video và hiển thị chi tiết
-│       ├── VideoController.java               # Khu vực admin: CRUD Video với upload Multipart
-│       ├── CategoryController.java            # Khu vực admin: CRUD Category
-│       └── DownloadImageController.java       # Phục vụ tệp tin ảnh từ thư mục lưu trữ cục bộ
-└── src\main\webapp
-    ├── WEB-INF\web.xml                        # File cấu hình web app
-    └── views
-        ├── home.jsp                           # Giao diện trang chủ với Top 10 video
-        ├── login.jsp                          # Giao diện đăng nhập
-        ├── register.jsp                       # Giao diện đăng ký tài khoản
-        ├── verify-otp.jsp                     # Giao diện xác thực mã OTP
-        ├── forgot-password.jsp                # Giao diện yêu cầu cấp lại mật khẩu
-        ├── reset-password.jsp                 # Giao diện đặt mật khẩu mới
-        ├── video-list.jsp                     # Danh sách video phân trang 6 video/trang (/video)
-        ├── video-detail.jsp                   # Trình phát video HTML5 và thông tin chi tiết
-        └── admin
-            ├── category-list.jsp / category-add.jsp / category-edit.jsp
-            └── video-list.jsp / video-add.jsp / video-edit.jsp
+src/main/java/vn/iotstar/
+├── config/
+│   ├── JpaConfig.java               # Cấu hình EntityManagerFactory JPA 3.0
+│   └── Test.java                    # Script kiểm thử kết nối CSDL và ORM
+├── controller/
+│   ├── HomeController.java          # Trang chủ: 10 video mới nhất & danh mục
+│   ├── LoginController.java         # Đăng nhập bảo mật BCrypt
+│   ├── LogoutController.java        # Đăng xuất phiên làm việc
+│   ├── RegisterController.java      # Đăng ký tài khoản và gửi mã OTP
+│   ├── VerifyOtpController.java     # Xác thực mã OTP kích hoạt tài khoản
+│   ├── ForgotPasswordController.java# Gửi mã OTP lấy lại mật khẩu
+│   ├── ResetPasswordController.java # Đổi mật khẩu mới qua OTP
+│   ├── VideoController.java         # Danh sách video phân trang và phát video
+│   ├── DownloadFileController.java  # Tải và hiển thị ảnh upload Multipart
+│   └── admin/
+│       ├── CategoryController.java  # CRUD Danh mục sản phẩm
+│       └── VideoController.java     # CRUD Quản trị video
+├── dao/
+│   ├── ICategoryDao.java / impl/CategoryDaoImpl.java
+│   ├── IUserDao.java / impl/UserDaoImpl.java
+│   └── IVideoDao.java / impl/VideoDaoImpl.java
+├── entity/
+│   ├── Category.java                # Thực thể Danh mục
+│   ├── User.java                    # Thực thể Người dùng (status, code, BCrypt)
+│   └── Video.java                   # Thực thể Video (quan hệ với User và Category)
+├── service/
+│   ├── ICategoryService.java / impl/CategoryServiceImpl.java
+│   ├── IUserService.java / impl/UserServiceImpl.java
+│   └── IVideoService.java / impl/VideoServiceImpl.java
+└── util/
+    ├── Constant.java                # Hằng số đường dẫn và thư mục upload
+    ├── EmailUtil.java               # Gửi email thật qua SMTP và sinh mã OTP
+    └── PasswordUtil.java            # Băm và kiểm tra mật khẩu BCrypt
 ```
 
 ---
@@ -304,6 +293,7 @@ Thư mục lưu trữ: Hệ thống tự động phát hiện phân vùng đĩa 
    ```
 
    Script sẽ tự động:
+
    * Biên dịch mã nguồn với Maven và JDK 17.
    * Tạo tệp `target\JPA_Servlet_Category.war`.
    * Tự động sao chép file WAR vào thư mục `webapps` của Apache Tomcat (`E:\apache-tomcat-11.0.27\webapps` hoặc `C:\apache-tomcat-11.0.27\webapps`).

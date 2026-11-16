@@ -33,7 +33,7 @@
 <body>
     <div class="nav-links">
         <a href="<c:url value="/home"/>">&larr; Trang chủ</a> | 
-        <a href="<c:url value="/video"/>">Xem trang Video (/video)</a> | 
+        <a href="<c:url value="/video"/>">Xem trang Video</a> | 
         <a href="<c:url value="/admin/videos"/>"><b>Quản lý Videos (CRUD)</b></a> | 
         <a href="<c:url value="/admin/categories"/>">Quản trị Category</a> | 
         <a href="<c:url value="/logout"/>" style="color: #dc2626;">Đăng xuất</a>
