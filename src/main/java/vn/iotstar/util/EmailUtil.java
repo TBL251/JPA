@@ -1,14 +1,17 @@
 package vn.iotstar.util;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import java.util.Random;
 
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
@@ -153,12 +156,22 @@ public class EmailUtil {
             Transport.send(message);
             System.out.println("[EMAIL SERVICE THÀNH CÔNG] >>> Đã gửi email thật qua mạng Internet tới: " + toEmail + " <<<");
             success = true;
-        } catch (Exception e) {
+        } catch (AddressException e) {
+            System.err.println("[EMAIL SERVICE LỖI ĐỊA CHỈ] " + e.getMessage());
+            e.printStackTrace();
+            success = false;
+        } catch (MessagingException e) {
             System.err.println("[EMAIL SERVICE LỖI GỬI THẬT] " + e.getMessage());
             e.printStackTrace();
             success = false;
-        } finally {
-            // Đóng xử lý gửi thư
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("[EMAIL SERVICE LỖI ENCODING] " + e.getMessage());
+            e.printStackTrace();
+            success = false;
+        } catch (Exception e) {
+            System.err.println("[EMAIL SERVICE LỖI KHÁC] " + e.getMessage());
+            e.printStackTrace();
+            success = false;
         }
         return success;
     }
