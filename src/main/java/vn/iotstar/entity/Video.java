@@ -22,7 +22,7 @@ public class Video implements Serializable {
     private String videoId;
 
     @Column(name = "active")
-    private boolean active = true;
+    private Boolean active = true;
 
     @Column(name = "description", columnDefinition = "NVARCHAR(MAX) NULL")
     private String description;
@@ -34,7 +34,7 @@ public class Video implements Serializable {
     private String title;
 
     @Column(name = "views")
-    private int views = 0;
+    private Integer views = 0;
 
     // Bi-directional many-to-one association to Category
     @ManyToOne
@@ -81,10 +81,10 @@ public class Video implements Serializable {
     }
 
     public boolean getActive() {
-        return this.active;
+        return this.active != null ? this.active : true;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 
@@ -113,10 +113,10 @@ public class Video implements Serializable {
     }
 
     public int getViews() {
-        return this.views;
+        return this.views != null ? this.views : 0;
     }
 
-    public void setViews(int views) {
+    public void setViews(Integer views) {
         this.views = views;
     }
 

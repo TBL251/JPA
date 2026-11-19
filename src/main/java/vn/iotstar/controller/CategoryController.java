@@ -78,9 +78,18 @@ public class CategoryController extends HttpServlet {
             int status = (statusStr != null && !statusStr.isEmpty()) ? Integer.parseInt(statusStr) : 1;
             String images = req.getParameter("images");
 
+            // Server-side Validation
+            if (categoryname == null || categoryname.trim().isEmpty() || categoryname.trim().length() < 2 || categoryname.trim().length() > 100) {
+                req.setAttribute("alert", "Tên danh mục không được để trống và phải có độ dài từ 2 đến 100 ký tự!");
+                req.setAttribute("categoryname", categoryname);
+                req.setAttribute("images", images);
+                req.getRequestDispatcher("/views/admin/category-add.jsp").forward(req, resp);
+                return;
+            }
+
             // Đưa dữ liệu vào model
             Category category = new Category();
-            category.setCategoryname(categoryname);
+            category.setCategoryname(categoryname.trim());
             category.setStatus(status);
 
             String fname = "";
@@ -125,6 +134,20 @@ public class CategoryController extends HttpServlet {
             String statusStr = req.getParameter("status");
             int status = (statusStr != null && !statusStr.isEmpty()) ? Integer.parseInt(statusStr) : 1;
             String images = req.getParameter("images");
+
+            // Server-side Validation
+            if (categoryname == null || categoryname.trim().isEmpty() || categoryname.trim().length() < 2 || categoryname.trim().length() > 100) {
+                req.setAttribute("alert", "Tên danh mục không được để trống và phải có độ dài từ 2 đến 100 ký tự!");
+                Category category = cateService.findById(categoryid);
+                if (category == null) {
+                    category = new Category();
+                    category.setCategoryId(categoryid);
+                }
+                category.setCategoryname(categoryname);
+                req.setAttribute("cate", category);
+                req.getRequestDispatcher("/views/admin/category-edit.jsp").forward(req, resp);
+                return;
+            }
 
             // Đưa dữ liệu vào model
             Category category = cateService.findById(categoryid);

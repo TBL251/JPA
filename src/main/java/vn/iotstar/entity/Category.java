@@ -35,7 +35,7 @@ public class Category implements Serializable {
     private String images;
 
     @Column(name = "status")
-    private int status;
+    private Integer status = 1;
 
     // Bi-directional many-to-one association to Video
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
@@ -85,10 +85,10 @@ public class Category implements Serializable {
     }
 
     public int getStatus() {
-        return this.status;
+        return this.status != null ? this.status : 1;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

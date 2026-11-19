@@ -87,6 +87,19 @@ public class VideoController extends HttpServlet {
             String categoryIdStr = req.getParameter("categoryId");
             String posterUrl = req.getParameter("poster");
 
+            // Server-side Validation
+            if (videoId == null || videoId.trim().length() < 2 || title == null || title.trim().length() < 3 || categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
+                req.setAttribute("alert", "Vui lòng nhập đầy đủ Mã Video (>= 2 ký tự), Tiêu đề (>= 3 ký tự) và chọn Danh mục liên kết!");
+                req.setAttribute("videoId", videoId);
+                req.setAttribute("title", title);
+                req.setAttribute("description", description);
+                req.setAttribute("categoryId", categoryIdStr);
+                req.setAttribute("poster", posterUrl);
+                req.setAttribute("listcate", cateService.findAll());
+                req.getRequestDispatcher("/views/admin/video-add.jsp").forward(req, resp);
+                return;
+            }
+
             Video video = new Video();
             video.setVideoId(videoId != null ? videoId.trim() : "v" + System.currentTimeMillis());
             video.setTitle(title);
@@ -144,6 +157,17 @@ public class VideoController extends HttpServlet {
             if (video == null) {
                 video = new Video();
                 video.setVideoId(videoId);
+            }
+
+            // Server-side Validation
+            if (title == null || title.trim().length() < 3 || categoryIdStr == null || categoryIdStr.trim().isEmpty()) {
+                req.setAttribute("alert", "Vui lòng nhập đầy đủ Tiêu đề Video (>= 3 ký tự) và chọn Danh mục liên kết!");
+                video.setTitle(title);
+                video.setDescription(description);
+                req.setAttribute("video", video);
+                req.setAttribute("listcate", cateService.findAll());
+                req.getRequestDispatcher("/views/admin/video-edit.jsp").forward(req, resp);
+                return;
             }
 
             video.setTitle(title);
