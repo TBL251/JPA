@@ -43,10 +43,17 @@
   <servlet>
     <servlet-name>CategoryController</servlet-name>
     <servlet-class>vn.iotstar.controller.CategoryController</servlet-class>
+    <multipart-config />
   </servlet>
   <servlet-mapping>
     <servlet-name>CategoryController</servlet-name>
     <url-pattern>/admin/categories</url-pattern>
+    <url-pattern>/admin/category/list</url-pattern>
+    <url-pattern>/admin/category/add</url-pattern>
+    <url-pattern>/admin/category/insert</url-pattern>
+    <url-pattern>/admin/category/edit</url-pattern>
+    <url-pattern>/admin/category/update</url-pattern>
+    <url-pattern>/admin/category/delete</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>ForgotPasswordController</servlet-name>
@@ -80,14 +87,24 @@
   <servlet-mapping>
     <servlet-name>ProfileController</servlet-name>
     <url-pattern>/profile</url-pattern>
+    <url-pattern>/profile/update</url-pattern>
+    <url-pattern>/profile/verify-otp</url-pattern>
+    <url-pattern>/profile/resend-otp</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>VideoController</servlet-name>
     <servlet-class>vn.iotstar.controller.VideoController</servlet-class>
+    <multipart-config />
   </servlet>
   <servlet-mapping>
     <servlet-name>VideoController</servlet-name>
     <url-pattern>/admin/videos</url-pattern>
+    <url-pattern>/admin/video/list</url-pattern>
+    <url-pattern>/admin/video/add</url-pattern>
+    <url-pattern>/admin/video/insert</url-pattern>
+    <url-pattern>/admin/video/edit</url-pattern>
+    <url-pattern>/admin/video/update</url-pattern>
+    <url-pattern>/admin/video/delete</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>UserVideoController</servlet-name>
@@ -103,6 +120,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>VideoDetailController</servlet-name>
+    <url-pattern>/video/detail</url-pattern>
     <url-pattern>/video-detail</url-pattern>
   </servlet-mapping>
   <servlet>
@@ -119,6 +137,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>DownloadImageController</servlet-name>
+    <url-pattern>/image</url-pattern>
     <url-pattern>/image/*</url-pattern>
   </servlet-mapping>
   <welcome-file-list>

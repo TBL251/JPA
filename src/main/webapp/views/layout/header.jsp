@@ -23,9 +23,9 @@
       </ul>
       <ul class="navbar-nav ms-auto">
         <c:choose>
-          <c:when test="${not empty sessionScope.user}">
-            <li class="nav-item"><a class="nav-link text-light" href="<c:url value='/profile'/>"><i class="bi bi-person-circle me-1"></i>${sessionScope.user.userName}</a></li>
-            <c:if test="${sessionScope.user.role == 1}">
+          <c:when test="${not empty sessionScope.account}">
+            <li class="nav-item"><a class="nav-link text-light" href="<c:url value='/profile'/>"><i class="bi bi-person-circle me-1"></i>${not empty sessionScope.account.fullName ? sessionScope.account.fullName : sessionScope.account.userName}</a></li>
+            <c:if test="${sessionScope.account.roleid == 1 || sessionScope.account.roleid == 2}">
               <li class="nav-item"><a class="nav-link text-warning" href="<c:url value='/admin/categories'/>"><i class="bi bi-gear me-1"></i>Admin</a></li>
             </c:if>
             <li class="nav-item"><a class="btn btn-outline-light btn-sm px-3 ms-2 nav-link" href="<c:url value='/logout'/>">&#272;&#259;ng Xu&#7845;t</a></li>
