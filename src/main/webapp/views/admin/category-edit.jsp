@@ -1,89 +1,95 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cập Nhật Danh Mục - JPA 3.0</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px auto; max-width: 650px; background-color: #f8fafc; color: #1e293b; }
-        .card { background: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        h2 { margin-top: 0; color: #0f172a; font-size: 22px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; color: #334155; }
-        input[type="text"], input[type="file"] { width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-        input[type="text"]:focus { outline: none; border-color: #2563eb; }
-        .radio-group { display: flex; gap: 20px; align-items: center; margin-top: 6px; }
-        .radio-group label { display: inline-flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; }
-        .actions { display: flex; gap: 12px; margin-top: 25px; }
-        .btn { padding: 10px 22px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; border: none; }
-        .btn-primary { background: #2563eb; color: #fff; }
-        .btn-primary:hover { background: #1d4ed8; }
-        .btn-secondary { background: #e2e8f0; color: #334155; }
-        .btn-secondary:hover { background: #cbd5e1; }
-        .img-preview { margin: 10px 0; }
-        .img-preview img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>Cập Nhật Danh Mục #${cate.categoryid}</h2>
-        <form action="<c:url value="/admin/category/update"/>" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="categoryid" value="${cate.categoryid}">
-            
-            <div class="form-group">
-                <label for="categoryname">Tên Danh Mục (Category Name):</label>
-                <input type="text" id="categoryname" name="categoryname" value="${cate.categoryname}" required>
+<c:set var="pageTitle" value="C&#7853;p Nh&#7853;t Danh M&#7909;c - Admin" scope="request"/>
+<jsp:include page="/views/layout/admin-header.jsp"/>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card shadow-sm border-0 rounded-3">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-primary">
+                    <i class="bi bi-pencil-square me-2"></i>C&#7853;p Nh&#7853;t Danh M&#7909;c #${cate.categoryId}
+                </h5>
+                <a href="<c:url value='/admin/categories'/>" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i>Quay l&#7841;i danh s&#225;ch
+                </a>
             </div>
 
-            <div class="form-group">
-                <label for="images">Link hình ảnh (URL nếu có):</label>
-                <input type="text" id="images" name="images" value="${cate.images}">
-            </div>
+            <div class="card-body p-4">
+                <c:if test="${not empty alert}">
+                    <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2 flex-shrink-0"></i>
+                        <div>${alert}</div>
+                    </div>
+                </c:if>
 
-            <div class="form-group">
-                <label>Ảnh hiện tại:</label>
-                <div class="img-preview">
-                    <c:choose>
-                        <c:when test="${cate.images != null && cate.images.startsWith('https')}">
-                            <c:url value="${cate.images}" var="imgUrl"/>
-                        </c:when>
-                        <c:when test="${cate.images != null && !empty cate.images}">
-                            <c:url value="/image?fname=${cate.images}" var="imgUrl"/>
-                        </c:when>
-                        <c:otherwise>
-                            <c:url value="https://placehold.co/140x100?text=No+Image" var="imgUrl"/>
-                        </c:otherwise>
-                    </c:choose>
-                    <img src="${imgUrl}" alt="${cate.categoryname}" 
-                         onerror="this.onerror=null; this.src='https://placehold.co/140x100?text=Image';"/>
-                </div>
-            </div>
+                <form action="<c:url value='/admin/category/update'/>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <input type="hidden" name="categoryid" value="${cate.categoryId}">
 
-            <div class="form-group">
-                <label for="images1">Thay đổi ảnh (Tải file mới từ máy tính):</label>
-                <input type="file" id="images1" name="images1" accept="image/*">
-            </div>
+                    <div class="mb-3">
+                        <label for="categoryname" class="form-label fw-semibold">T&#234;n Danh M&#7909;c <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="categoryname" name="categoryname"
+                               value="${cate.categoryname}" placeholder="V&#237; d&#7909;: &#272;i&#7879;n tho&#7841;i, Laptop, Th&#7901;i trang..."
+                               required minlength="2" maxlength="100">
+                        <div class="invalid-feedback">T&#234;n danh m&#7909;c kh&#244;ng &#273;&#432;&#7907;c &#273;&#7875; tr&#7889;ng v&#224; ph&#7843;i c&#243; &#273;&#7897; d&#224;i t&#7915; 2 &#273;&#7871;n 100 k&#253; t&#7921;.</div>
+                    </div>
 
-            <div class="form-group">
-                <label>Trạng thái (Status):</label>
-                <div class="radio-group">
-                    <label>
-                        <input type="radio" id="ston" name="status" value="1" ${cate.status == 1 ? 'checked' : ''}> Hoạt động
-                    </label>
-                    <label>
-                        <input type="radio" id="stoff" name="status" value="0" ${cate.status != 1 ? 'checked' : ''}> Khóa
-                    </label>
-                </div>
-            </div>
+                    <div class="mb-3">
+                        <label for="images" class="form-label fw-semibold">Link H&#236;nh &#7842;nh (URL tr&#7921;c ti&#7871;p n&#7871;u c&#243;)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                            <input type="url" class="form-control" id="images" name="images"
+                                   value="${cate.images}" placeholder="https://example.com/image.jpg">
+                        </div>
+                    </div>
 
-            <div class="actions">
-                <button type="submit" class="btn btn-primary">Cập Nhật</button>
-                <a href="<c:url value="/admin/categories"/>" class="btn btn-secondary">Quay lại danh sách</a>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold d-block">&#7842;nh hi&#7879;n t&#7841;i:</label>
+                        <c:choose>
+                            <c:when test="${cate.images != null && cate.images.startsWith('http')}">
+                                <img src="${cate.images}" alt="${cate.categoryname}" class="rounded border p-1" style="width: 140px; height: 100px; object-fit: cover;">
+                            </c:when>
+                            <c:when test="${cate.images != null && !empty cate.images}">
+                                <img src="<c:url value='/image?fname=${cate.images}'/>" alt="${cate.categoryname}" class="rounded border p-1" style="width: 140px; height: 100px; object-fit: cover;">
+                            </c:when>
+                            <c:otherwise>
+                                <span class="text-muted small fst-italic">Ch&#432;a c&#243; &#7843;nh</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="images1" class="form-label fw-semibold">T&#7843;i &#7843;nh m&#7899;i thay th&#7871; (t&#249;y ch&#7885;n)</label>
+                        <input type="file" class="form-control" id="images1" name="images1" accept="image/*">
+                        <div class="form-text">H&#7895; tr&#7907; c&#225;c &#273;&#7883;nh d&#7841;ng: .jpg, .jpeg, .png, .webp, .gif.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold d-block">Tr&#7841;ng th&#225;i (Status)</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="statusActive" value="1" ${cate.status == 1 ? 'checked' : ''}>
+                            <label class="form-check-label text-success fw-semibold" for="statusActive">
+                                <i class="bi bi-check-circle me-1"></i>Ho&#7841;t &#273;&#7897;ng
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="statusInactive" value="0" ${cate.status == 0 ? 'checked' : ''}>
+                            <label class="form-check-label text-secondary fw-semibold" for="statusInactive">
+                                <i class="bi bi-x-circle me-1"></i>T&#7841;m kh&#243;a
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end pt-3 border-top">
+                        <a href="<c:url value='/admin/categories'/>" class="btn btn-secondary px-4">H&#7911;y b&#7887;</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-check-lg me-1"></i>C&#7853;p Nh&#7853;t Danh M&#7909;c
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
-</body>
-</html>
+</div>
 
+<jsp:include page="/views/layout/admin-footer.jsp"/>

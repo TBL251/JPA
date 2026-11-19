@@ -1,72 +1,81 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập - Hệ Thống HCMUTE JPA</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f1f5f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 420px; }
-        h2 { margin-top: 0; text-align: center; color: #0f172a; margin-bottom: 20px; }
-        .subtitle { text-align: center; color: #64748b; font-size: 13px; margin-top: -15px; margin-bottom: 22px; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; color: #334155; }
-        input[type="text"], input[type="password"] { width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-        .row-options { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 20px; }
-        .remember-group { display: flex; align-items: center; gap: 6px; color: #475569; }
-        .forgot-link { color: #2563eb; text-decoration: none; font-weight: 600; }
-        .forgot-link:hover { text-decoration: underline; }
-        .btn-submit { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; }
-        .btn-submit:hover { background: #1d4ed8; }
-        .alert { background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 14px; }
-        .success { background: #dcfce7; border-left: 4px solid #22c55e; color: #166534; padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 14px; }
-        .footer-links { text-align: center; margin-top: 20px; font-size: 14px; color: #64748b; }
-        .footer-links a { color: #2563eb; text-decoration: none; font-weight: 600; }
-        .direct-link { text-align: center; margin-top: 15px; font-size: 13px; display: flex; justify-content: center; gap: 15px; }
-        .direct-link a { color: #64748b; text-decoration: none; }
-        .direct-link a:hover { color: #2563eb; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>Đăng Nhập</h2>
-        <div class="subtitle">Mật khẩu được mã hóa băm bảo mật BCrypt</div>
+<c:set var="pageTitle" value="&#272;&#259;ng Nh&#7853;p - HCMUTE JPA" scope="request"/>
+<jsp:include page="/views/layout/header.jsp"/>
 
-        <c:if test="${not empty alert}">
-            <div class="alert">${alert}</div>
-        </c:if>
-        <c:if test="${not empty message}">
-            <div class="success">${message}</div>
-        </c:if>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-body p-4 p-sm-5">
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 56px; height: 56px;">
+                            <i class="bi bi-box-arrow-in-right fs-2"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-1">&#272;&#259;ng Nh&#7853;p</h3>
+                        <p class="text-muted small mb-0">M&#7853;t kh&#7849;u &#273;&#432;&#7907;c m&#227; h&#243;a an to&#224;n b&#7857;ng BCrypt</p>
+                    </div>
 
-        <form action="<c:url value="/login"/>" method="post">
-            <div class="form-group">
-                <label for="username">Tên đăng nhập hoặc Email:</label>
-                <input type="text" id="username" name="username" placeholder="Nhập username hoặc email" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Mật khẩu:</label>
-                <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
-            </div>
-            <div class="row-options">
-                <div class="remember-group">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember" style="margin-bottom:0; font-weight:normal; cursor:pointer;">Ghi nhớ đăng nhập</label>
+                    <c:if test="${not empty alert}">
+                        <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2 flex-shrink-0"></i>
+                            <div>${alert}</div>
+                        </div>
+                    </c:if>
+                    <c:if test="${not empty message}">
+                        <div class="alert alert-success d-flex align-items-center mb-3" role="alert">
+                            <i class="bi bi-check-circle-fill me-2 flex-shrink-0"></i>
+                            <div>${message}</div>
+                        </div>
+                    </c:if>
+
+                    <form action="<c:url value='/login'/>" method="post" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">T&#234;n &#273;&#259;ng nh&#7853;p ho&#7863;c Email <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" id="username" name="username"
+                                       value="${username}" placeholder="Nh&#7853;p username ho&#7863;c email"
+                                       required minlength="3">
+                                <div class="invalid-feedback">Vui l&#242;ng nh&#7853;p t&#234;n &#273;&#259;ng nh&#7853;p ho&#7863;c email (t&#7889;i thi&#7875;u 3 k&#253; t&#7921;).</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label fw-semibold">M&#7853;t kh&#7849;u <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="Nh&#7853;p m&#7853;t kh&#7849;u" required minlength="3">
+                                <div class="invalid-feedback">Vui l&#242;ng nh&#7853;p m&#7853;t kh&#7849;u (t&#7889;i thi&#7875;u 3 k&#253; t&#7921;).</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                <label class="form-check-label text-muted small" for="remember">Ghi nh&#7899; &#273;&#259;ng nh&#7853;p</label>
+                            </div>
+                            <a href="<c:url value='/forgot-password'/>" class="text-primary text-decoration-none small fw-semibold">
+                                Qu&#234;n m&#7853;t kh&#7849;u?
+                            </a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>&#272;&#259;ng Nh&#7853;p
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-2 border-top">
+                        <span class="text-muted small">Ch&#432;a c&#243; t&#224;i kho&#7843;n?</span>
+                        <a href="<c:url value='/register'/>" class="text-primary text-decoration-none small fw-semibold ms-1">
+                            &#272;&#259;ng k&#253; ngay
+                        </a>
+                    </div>
                 </div>
-                <a href="<c:url value="/forgot-password"/>" class="forgot-link">Quên mật khẩu?</a>
             </div>
-            <button type="submit" class="btn-submit">Đăng Nhập</button>
-        </form>
-
-        <div class="footer-links">
-            Chưa có tài khoản? <a href="<c:url value="/register"/>">Đăng ký ngay</a>
-        </div>
-        <div class="direct-link">
-            <a href="<c:url value="/home"/>">&larr; Về Trang Chủ</a>
-            <a href="<c:url value="/video"/>">Xem Videos &rarr;</a>
         </div>
     </div>
-</body>
-</html>
+</div>
+
+<jsp:include page="/views/layout/footer.jsp"/>

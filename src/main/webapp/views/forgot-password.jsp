@@ -1,46 +1,55 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quên Mật Khẩu - HCMUTE JPA</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f1f5f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); width: 100%; max-width: 420px; }
-        h2 { margin-top: 0; text-align: center; color: #0f172a; margin-bottom: 8px; }
-        .subtitle { text-align: center; color: #64748b; font-size: 14px; margin-bottom: 22px; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; color: #334155; }
-        input[type="email"], input[type="text"] { width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
-        .btn-submit { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; }
-        .btn-submit:hover { background: #1d4ed8; }
-        .alert { background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; padding: 10px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 14px; }
-        .footer-links { text-align: center; margin-top: 20px; font-size: 14px; color: #64748b; }
-        .footer-links a { color: #2563eb; text-decoration: none; font-weight: 600; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <h2>Quên Mật Khẩu</h2>
-        <div class="subtitle">Nhận mã OTP qua Email để khôi phục mật khẩu tài khoản</div>
+<c:set var="pageTitle" value="Qu&#234;n M&#7853;t Kh&#7849;u - HCMUTE JPA" scope="request"/>
+<jsp:include page="/views/layout/header.jsp"/>
 
-        <c:if test="${not empty alert}">
-            <div class="alert">${alert}</div>
-        </c:if>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+            <div class="card shadow border-0 rounded-3">
+                <div class="card-body p-4 p-sm-5">
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-circle mb-3" style="width: 56px; height: 56px;">
+                            <i class="bi bi-shield-lock-fill fs-2"></i>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-1">Qu&#234;n M&#7853;t Kh&#7849;u</h3>
+                        <p class="text-muted small mb-0">H&#7879; th&#7889;ng s&#7869; g&#7917;i m&#227; OTP qua email &#273;&#7875; b&#7841;n &#273;&#7863;t l&#7841;i m&#7853;t kh&#7849;u</p>
+                    </div>
 
-        <form action="<c:url value="/forgot-password"/>" method="post">
-            <div class="form-group">
-                <label for="email">Email đã đăng ký tài khoản:</label>
-                <input type="email" id="email" name="email" placeholder="example@gmail.com" required autofocus>
+                    <c:if test="${not empty alert}">
+                        <div class="alert alert-danger d-flex align-items-center mb-3" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2 flex-shrink-0"></i>
+                            <div>${alert}</div>
+                        </div>
+                    </c:if>
+
+                    <form action="<c:url value='/forgot-password'/>" method="post" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <label for="email" class="form-label fw-semibold">&#272;&#7883;a ch&#7881; Email &#273;&#227; &#273;&#259;ng k&#253; <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" name="email"
+                                       value="${email}" placeholder="example@gmail.com"
+                                       required pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" autofocus>
+                                <div class="invalid-feedback">Vui l&#242;ng nh&#7853;p &#273;&#7883;a ch&#7881; email h&#7907;p l&#7879; (v&#237; d&#7909;: ten@gmail.com).</div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100 py-2 fw-semibold text-dark">
+                            <i class="bi bi-send me-1"></i>G&#7917;i M&#227; X&#225;c Nh&#7853;n OTP
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-2 border-top">
+                        <span class="text-muted small">&#272;&#227; nh&#7899; l&#7841;i m&#7853;t kh&#7849;u?</span>
+                        <a href="<c:url value='/login'/>" class="text-primary text-decoration-none small fw-semibold ms-1">
+                            Quay l&#7841;i &#272;&#259;ng nh&#7853;p
+                        </a>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn-submit">Gửi Mã Xác Nhận OTP &rarr;</button>
-        </form>
-
-        <div class="footer-links">
-            Nhớ lại mật khẩu? <a href="<c:url value="/login"/>">Quay lại Đăng nhập</a>
         </div>
     </div>
-</body>
-</html>
+</div>
+
+<jsp:include page="/views/layout/footer.jsp"/>
