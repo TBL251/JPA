@@ -63,8 +63,16 @@ public class LoginController extends HttpServlet {
         String remember = req.getParameter("remember");
         boolean isRememberMe = "on".equals(remember);
 
+        req.setAttribute("username", username);
+
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không được rỗng!");
+            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không được để trống!");
+            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            return;
+        }
+
+        if (username.trim().length() < 3 || password.trim().length() < 3) {
+            req.setAttribute("alert", "Tên đăng nhập và mật khẩu phải chứa ít nhất 3 ký tự!");
             req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
             return;
         }

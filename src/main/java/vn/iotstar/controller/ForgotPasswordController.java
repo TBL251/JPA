@@ -28,9 +28,16 @@ public class ForgotPasswordController extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
 
         String email = req.getParameter("email");
+        req.setAttribute("email", email);
 
         if (email == null || email.trim().isEmpty()) {
             req.setAttribute("alert", "Vui lòng nhập địa chỉ email đã đăng ký!");
+            req.getRequestDispatcher("/views/forgot-password.jsp").forward(req, resp);
+            return;
+        }
+
+        if (!email.trim().matches("^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$")) {
+            req.setAttribute("alert", "Địa chỉ email không đúng định dạng hợp lệ!");
             req.getRequestDispatcher("/views/forgot-password.jsp").forward(req, resp);
             return;
         }
