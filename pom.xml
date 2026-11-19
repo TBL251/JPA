@@ -121,6 +121,20 @@
             <version>1.18.32</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Layout Master (SiteMesh Decorator 3 chuan Jakarta EE) - compile only, runtime handled by LayoutFilter -->
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh-webfilter</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
+        <!-- Cloudinary Java SDK (Cloud Image Storage) -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>1.38.0</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -37,4 +37,10 @@ build/
 
 ### Mail credentials (Bảo mật tài khoản Email/App Password) ###
 src/main/resources/mail.properties
+src/main/resources/cloudinary.properties
+graphify-out/
+
+### Documents ###
+*.docx
+sitemech.docx
 
