@@ -1,0 +1,5 @@
+# Mau cau hinh Cloudinary
+# Thay the thong tin tai khoan that cua ban tu https://cloudinary.com/console
+cloudinary.cloud_name=your_cloud_name
+cloudinary.api_key=your_api_key
+cloudinary.api_secret=your_api_secret
