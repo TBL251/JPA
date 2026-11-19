@@ -50,7 +50,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findById(int id) {
-        return userDao.findById(id);
+        User u = userDao.findById(id);
+        if (u == null) {
+            for (User pending : pendingUsers.values()) {
+                if (pending.getId() == id) {
+                    return pending;
+                }
+            }
+        }
+        return u;
     }
 
     @Override
@@ -72,7 +80,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void update(User user) {
-        userDao.update(user);
+        if (user == null) {
+            return;
+        }
+        if (user.getUserName() != null) {
+            pendingUsers.put(user.getUserName().trim().toLowerCase(), user);
+        }
+        if (user.getEmail() != null && !user.getEmail().trim().isEmpty()) {
+            pendingUsers.put(user.getEmail().trim().toLowerCase(), user);
+        }
+        try {
+            userDao.update(user);
+        } catch (Exception e) {
+            System.err.println("[USER UPDATE] Ghi CSDL có lỗi hoặc ngoại tuyến, đồng bộ bộ nhớ tạm: " + e.getMessage());
+        }
     }
 
     @Override

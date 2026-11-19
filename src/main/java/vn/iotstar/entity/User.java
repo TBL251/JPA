@@ -43,13 +43,13 @@ public class User implements Serializable {
     private String avatar;
 
     @Column(name = "roleid")
-    private int roleid; // 1: Admin, 2: Manager, 3: User
+    private Integer roleid = 3; // 1: Admin, 2: Manager, 3: User
 
     @Column(name = "phone", columnDefinition = "VARCHAR(20) NULL")
     private String phone;
 
     @Column(name = "status")
-    private int status = 1; // 0: Cho kich hoat OTP, 1: Da kich hoat
+    private Integer status = 1; // 0: Cho kich hoat OTP, 1: Da kich hoat
 
     @Column(name = "code", columnDefinition = "VARCHAR(10) NULL")
     private String code; // Ma OTP xac thuc (6 chu so)
@@ -140,10 +140,10 @@ public class User implements Serializable {
     }
 
     public int getRoleid() {
-        return roleid;
+        return roleid != null ? roleid : 3;
     }
 
-    public void setRoleid(int roleid) {
+    public void setRoleid(Integer roleid) {
         this.roleid = roleid;
     }
 
@@ -156,11 +156,36 @@ public class User implements Serializable {
     }
 
     public int getStatus() {
-        return status;
+        return status != null ? status : 1;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    // Alias getters/setters cho tuong thich JSP/EL
+    public String getUsername() {
+        return userName;
+    }
+
+    public void setUsername(String username) {
+        this.userName = username;
+    }
+
+    public String getFullname() {
+        return fullName;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullName = fullname;
+    }
+
+    public String getImages() {
+        return avatar;
+    }
+
+    public void setImages(String images) {
+        this.avatar = images;
     }
 
     public String getCode() {
