@@ -41,10 +41,31 @@
                     <c:url value="https://placehold.co/800x450?text=HCMUTE+Video" var="posterImg"/>
                 </c:otherwise>
             </c:choose>
-            <video controls autoplay poster="${posterImg}">
-                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
-                Tr&#236;nh duy&#7879;t c&#7911;a b&#7841;n kh&#244;ng h&#7895; tr&#7907; th&#7867; video HTML5.
-            </video>
+            <c:choose>
+                <c:when test="${not empty embedUrl}">
+                    <iframe src="${embedUrl}" title="${video.title}"
+                            style="width: 100%; height: 100%; border: 0;"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                </c:when>
+                <c:otherwise>
+                    <c:choose>
+                        <c:when test="${not empty video.videoUrl && video.videoUrl.startsWith('http')}">
+                            <c:set var="videoSrc" value="${video.videoUrl}"/>
+                        </c:when>
+                        <c:when test="${not empty video.videoUrl}">
+                            <c:url value="/image?fname=${video.videoUrl}" var="videoSrc"/>
+                        </c:when>
+                        <c:otherwise>
+                            <c:set var="videoSrc" value="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"/>
+                        </c:otherwise>
+                    </c:choose>
+                    <video controls playsinline preload="metadata" poster="${posterImg}">
+                        <source src="${videoSrc}">
+                        Tr&#236;nh duy&#7879;t c&#7911;a b&#7841;n kh&#244;ng h&#7895; tr&#7907; th&#7867; video HTML5.
+                    </video>
+                </c:otherwise>
+            </c:choose>
         </div>
 
         <div class="video-details">

@@ -94,7 +94,11 @@
   <servlet>
     <servlet-name>VideoController</servlet-name>
     <servlet-class>vn.iotstar.controller.VideoController</servlet-class>
-    <multipart-config />
+    <multipart-config>
+      <max-file-size>104857600</max-file-size>
+      <max-request-size>125829120</max-request-size>
+      <file-size-threshold>2097152</file-size-threshold>
+    </multipart-config>
   </servlet>
   <servlet-mapping>
     <servlet-name>VideoController</servlet-name>

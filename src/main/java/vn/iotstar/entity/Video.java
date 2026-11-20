@@ -30,6 +30,9 @@ public class Video implements Serializable {
     @Column(name = "poster", columnDefinition = "NVARCHAR(255) NULL")
     private String poster;
 
+    @Column(name = "videoUrl", columnDefinition = "NVARCHAR(500) NULL")
+    private String videoUrl;
+
     @Column(name = "title", columnDefinition = "NVARCHAR(255) NULL")
     private String title;
 
@@ -102,6 +105,14 @@ public class Video implements Serializable {
 
     public void setPoster(String poster) {
         this.poster = poster;
+    }
+
+    public String getVideoUrl() {
+        return this.videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
     }
 
     public String getTitle() {

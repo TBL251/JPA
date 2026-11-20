@@ -68,6 +68,26 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="videoFile" class="form-label fw-semibold">T&#7843;i l&#234;n file Video m&#7899;i thay th&#7871; (t&#249;y ch&#7885;n)</label>
+                        <input type="file" class="form-control" id="videoFile" name="videoFile" accept="video/mp4,video/webm,video/ogg,video/*">
+                        <div class="form-text">
+                            <c:choose>
+                                <c:when test="${not empty video.videoUrl}">Ngu&#7891;n hi&#7879;n t&#7841;i: <code>${video.videoUrl}</code></c:when>
+                                <c:otherwise>Ch&#432;a c&#243; file/link video ri&#234;ng (&#273;ang d&#249;ng video m&#7851;u).</c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="videoUrl" class="form-label fw-semibold">Ho&#7863;c li&#234;n k&#7871;t Video tr&#7921;c tuy&#7871;n (URL MP4 / YouTube)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-camera-video"></i></span>
+                            <input type="text" class="form-control" id="videoUrl" name="videoUrl"
+                                   value="${video.videoUrl}" placeholder="https://www.youtube.com/watch?v=... ho&#7863;c link .mp4">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="posterFile" class="form-label fw-semibold">T&#7843;i l&#234;n Poster m&#7899;i thay th&#7871; (t&#249;y ch&#7885;n)</label>
                         <input type="file" class="form-control" id="posterFile" name="posterFile" accept="image/*">
                         <div class="form-text">H&#7895; tr&#7907; c&#225;c &#273;&#7883;nh d&#7841;ng: .jpg, .jpeg, .png, .webp.</div>
@@ -77,7 +97,7 @@
                         <label for="poster" class="form-label fw-semibold">Ho&#7863;c li&#234;n k&#7871;t Poster tr&#7921;c tuy&#7871;n (URL)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
-                            <input type="url" class="form-control" id="poster" name="poster"
+                            <input type="text" class="form-control" id="poster" name="poster"
                                    value="${video.poster}" placeholder="https://images.unsplash.com/...">
                         </div>
                     </div>

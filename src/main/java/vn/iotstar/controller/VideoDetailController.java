@@ -46,8 +46,28 @@ public class VideoDetailController extends HttpServlet {
         List<Video> relatedVideos = videoService.findTop10Latest();
 
         req.setAttribute("video", video);
+        req.setAttribute("embedUrl", toYoutubeEmbed(video.getVideoUrl()));
         req.setAttribute("relatedVideos", relatedVideos);
 
         req.getRequestDispatcher("/views/video-detail.jsp").forward(req, resp);
+    }
+
+    private String toYoutubeEmbed(String url) {
+        if (url == null) return null;
+        String u = url.trim();
+        if (u.contains("youtube.com/embed/")) return u;
+        if (u.contains("youtube.com/watch")) {
+            int idx = u.indexOf("v=");
+            if (idx >= 0) {
+                String id = u.substring(idx + 2).split("[&#]")[0];
+                if (!id.isEmpty()) return "https://www.youtube.com/embed/" + id;
+            }
+        }
+        if (u.contains("youtu.be/")) {
+            int idx = u.indexOf("youtu.be/");
+            String id = u.substring(idx + 9).split("[?&#]")[0];
+            if (!id.isEmpty()) return "https://www.youtube.com/embed/" + id;
+        }
+        return null;
     }
 }

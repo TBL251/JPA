@@ -61,6 +61,7 @@ BEGIN
         active BIT NOT NULL DEFAULT 1,
         description NVARCHAR(MAX) NULL,
         poster NVARCHAR(255) NULL,
+        videoUrl NVARCHAR(500) NULL,
         title NVARCHAR(255) NULL,
         views INT NOT NULL DEFAULT 0,
         categoryId INT NULL,
@@ -71,11 +72,15 @@ BEGIN
 END
 ELSE
 BEGIN
-    -- Tu dong cap nhat cot userId neu bang da ton tai
+    -- Tu dong cap nhat cot userId va videoUrl neu bang da ton tai
     IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('videos') AND name = 'userId')
     BEGIN
         ALTER TABLE videos ADD userId INT NULL;
         ALTER TABLE videos ADD CONSTRAINT FK_Videos_Users FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE;
+    END
+    IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('videos') AND name = 'videoUrl')
+    BEGIN
+        ALTER TABLE videos ADD videoUrl NVARCHAR(500) NULL;
     END
 END
 GO

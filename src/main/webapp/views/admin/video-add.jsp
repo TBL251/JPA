@@ -52,6 +52,21 @@
                     </div>
 
                     <div class="mb-3">
+                        <label for="videoFile" class="form-label fw-semibold">T&#7843;i l&#234;n file Video (Multipart - MP4, WebM, OGG)</label>
+                        <input type="file" class="form-control" id="videoFile" name="videoFile" accept="video/mp4,video/webm,video/ogg,video/*">
+                        <div class="form-text">H&#7895; tr&#7907; file .mp4, .webm, .ogg, .mov (t&#7889;i &#273;a 100MB).</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="videoUrl" class="form-label fw-semibold">Ho&#7863;c li&#234;n k&#7871;t Video tr&#7921;c tuy&#7871;n (URL MP4 / YouTube)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-camera-video"></i></span>
+                            <input type="text" class="form-control" id="videoUrl" name="videoUrl"
+                                   value="${videoUrl}" placeholder="https://www.youtube.com/watch?v=... ho&#7863;c link .mp4">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
                         <label for="posterFile" class="form-label fw-semibold">T&#7843;i l&#234;n file &#7843;nh Poster (Multipart)</label>
                         <input type="file" class="form-control" id="posterFile" name="posterFile" accept="image/*">
                         <div class="form-text">H&#7895; tr&#7907; c&#225;c &#273;&#7883;nh d&#7841;ng: .jpg, .jpeg, .png, .webp.</div>
@@ -61,7 +76,7 @@
                         <label for="poster" class="form-label fw-semibold">Ho&#7863;c li&#234;n k&#7871;t Poster (URL Tr&#7921;c Tuy&#7871;n)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
-                            <input type="url" class="form-control" id="poster" name="poster"
+                            <input type="text" class="form-control" id="poster" name="poster"
                                    value="${poster}" placeholder="https://images.unsplash.com/...">
                         </div>
                     </div>
